@@ -7,7 +7,7 @@
 
     define ("INFRADIR", "/var/www"); // base OS directory 
     define ("UTILIB", INFRADIR. "/openopus_utils"); // directory for the utilities library
-    define ("BASEDIR", INFRADIR. "/concertmaster_api"); // directory for all project, including public and non-public files
+    define ("BASEDIR", INFRADIR. "/concertino_api"); // directory for all project, including public and non-public files
     define ("WEBDIR", BASEDIR. "/html"); // directory for publicly accessible files
     define ("LIB", BASEDIR. "/lib"); // directory for non-publicly accessible files, like libraries
     define ("LOG", BASEDIR. "/log"); // log dir
@@ -16,7 +16,7 @@
 
     // mysql 
 
-    define ("DBDB", "concertmaster"); // mysql database basename (the real name will be prefixed by the instance above)
+    define ("DBDB", "concertino"); // mysql database basename (the real name will be prefixed by the instance above)
     define ("DBHOST", "localhost"); // mysql host address
     define ("DBUSER", "username"); // mysql username
     define ("DBPASS", "password"); // mysql password

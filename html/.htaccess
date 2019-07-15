@@ -1,4 +1,4 @@
-<If "%{HTTP_HOST} == 'api.concertmaster.local'">
+<If "%{HTTP_HOST} == 'api.concertino.local'">
 Header set Access-Control-Allow-Origin "*"
 </If>
 AddType 'application/json' .json

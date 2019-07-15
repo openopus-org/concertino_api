@@ -321,7 +321,7 @@
     return Array ("type"=> $return, "items"=>${$return}, "stats"=>$stats, "extras"=>$extras);
   }
 
-  // add concertmaster own extradata to spotify metadata
+  // add concertino own extradata to spotify metadata
 
   function extradata ($spot, $params)
   {

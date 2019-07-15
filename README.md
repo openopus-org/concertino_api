@@ -13,7 +13,7 @@ This API relies on an utilities library (https://github.com/adrianosbr/openopus_
 2. Install the data (create a database first, for example, dev_concertino)
 
 ```bash
-mysql -u USER -p dev_concertmaster < /var/www/concertino_api/db.sql
+mysql -u USER -p dev_concertino < /var/www/concertino_api/db.sql
 ```
 
 3. Create an inc.php file from the example:
