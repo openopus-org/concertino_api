@@ -1,24 +1,14 @@
 <?
   // api wrapers
 
-  function spotifydownparse ($url, $token)
+  function appledownparse ($url, $token)
   {
     return apidownparse ($url, "json", $token);
   }
 
-  // spotify wrapper
+  // fetch and analyze apple music metadata
 
-  function spotifyauth ()
-  {
-    $api = CURL_Internals (SPOTIFYTOKENAPI, false, Array (SPOTIFYID, SPOTIFYSECRET), "grant_type=client_credentials", false);
-    $tok = json_decode ($api, true);
-
-    return $tok["access_token"];
-  }
-
-  // fetch and analyze spotify metadata
-
-  function fetchspotify ($work, $return, $offset = 0)
+  function fetchapple ($work, $return, $offset = 0)
   {
     global $mysql;
     
@@ -95,83 +85,51 @@
 
     // searching spotify
 
-    $token = spotifyauth ();
+    $token = APPMUSTOKEN;
 
     if ($return == "albums")
     {    
-      $spalbums = spotifydownparse (SPOTIFYAPI. "/search/?limit=". SAPI_ITEMS. "&type=track&offset={$offset}&q=track:". trim(urlencode ($search. " artist:{$work["composer"]["complete_name"]}")), $token);
+      $spalbums = appledownparse (APPLEMUSICAPI. "/catalog/us/search?types=songs&offset={$offset}&limit=". APPLAPI_ITEMS. "&term=". trim(urlencode ($search. " {$work["composer"]["complete_name"]}")), $token);
       $loop = 1;
       //$spalbums["tracks"]["next"] = $offset + SAPI_ITEMS;
 
-      while ($spalbums["tracks"]["next"] && $loop <= SAPI_PAGES)
+      while ($spalbums["results"]["songs"]["next"] && $loop <= APPLEAPI_PAGES)
       {
-        $morealbums = spotifydownparse ($spalbums["tracks"]["next"], $token);
-        $spalbums["tracks"]["items"] = array_merge ($spalbums["tracks"]["items"], $morealbums["tracks"]["items"]);
-        $spalbums["tracks"]["next"] = $morealbums["tracks"]["next"];
+        $morealbums = appledownparse (APPLEMUSICAPIBASE. $spalbums["results"]["songs"]["next"]. "&limit=". APPLAPI_ITEMS, $token);
+
+        $spalbums["results"]["songs"]["data"] = array_merge ($spalbums["results"]["songs"]["data"], $morealbums["results"]["songs"]["data"]);
+        $spalbums["results"]["songs"]["next"] = $morealbums["results"]["songs"]["next"];
         $loop++;
       }
 
-      //if ($spalbums["tracks"]["total"] < SAPI_ITEMS) $spalbums["tracks"]["next"] = "";
+      $data = $spalbums["results"]["songs"]["data"];
     }
     else if ($return == "tracks")
     {
-      $fspalbums = spotifydownparse (SPOTIFYAPI. "/albums/". $work["recording"]["spotify_albumid"]. "/?limit=". SAPI_ITEMS, $token);
-
-      if ($fspalbums["release_date_precision"] == "day") 
-      {
-        $year = $fspalbums["release_date"];
-      }
-      else if ($fspalbums["release_date_precision"] == "month") 
-      {
-        $year = $fspalbums["release_date"]. "-01";
-      }
-      else
-      {
-        $year = $fspalbums["release_date"]. "-01-01";
-      }
+      $spalbums = appledownparse (APPLEMUSICAPI. "/catalog/us/albums/". $work["recording"]["apple_albumid"], $token);
       
       $extras = Array 
         (
-          "label" => $fspalbums["label"],
-          "cover" => $fspalbums["images"][0]["url"],
-          "year" => $year,
-          "markets" => $fspalbums["available_markets"]
+          "label" => $spalbums["data"][0]["attributes"]["recordLabel"],
+          "cover" => str_replace ("{w}x{h}", "640x640", $spalbums["data"][0]["attributes"]["artwork"]["url"]),
+          "year" => $spalbums["data"][0]["attributes"]["releaseDate"]
         );
 
-      if (!sizeof ($fspalbums["tracks"]["items"]))
-      {
-        $spalbums = spotifydownparse ($fspalbums["tracks"]["href"], $token);
-      }
-      else
-      {
-        $spalbums = $fspalbums;
-      }
-
-      $loop = 0;
-
-      while ($spalbums["tracks"]["next"])
-      {
-        $morealbums = spotifydownparse ($spalbums["tracks"]["next"], $token);
-
-        $spalbums["tracks"]["items"] = array_merge ($spalbums["tracks"]["items"], $morealbums["items"]);
-        $spalbums["tracks"]["next"] = $morealbums["next"];
-        $loop++;
-      }
+      $data = $spalbums["data"][0]["relationships"]["tracks"]["data"];
     }
 
-    foreach ($spalbums["tracks"]["items"] as $kalb => $alb)
+    foreach ($data as $kalb => $alb)
     {
-      $alb["name"] = str_replace (end (explode (" ", $alb["artists"][0]["name"])), "", str_replace (end (explode (" ", $alb["artists"][0]["name"])). ": ", "", str_replace ($alb["artists"][0]["name"], "", str_replace ($alb["artists"][0]["name"]. ": ", "", $alb["name"]))));
-      $alb["name"] = preg_replace ('/^(( )*( |\,|\(|\'|\"|\-|\;|\:)( )*)/i', '', $alb["name"], 1);
+      $alb["attributes"]["name"] = preg_replace ('/^(( )*( |\,|\(|\'|\"|\-|\;|\:)( )*)/i', '', $alb["attributes"]["name"], 1);
 
       //similar_text ($work[0]["title"], explode (":", $alb["name"])[0], $similarity);
-      similar_text ($work["work"]["searchtitle"], worksimplifier (explode (":", $alb["name"])[0]), $similarity);
+      similar_text ($work["work"]["searchtitle"], worksimplifier (explode (":", $alb["attributes"]["name"])[0]), $similarity);
 
       $albunsfound = Array 
         (
-          "track_title" => $alb["name"],
+          "track_title" => $alb["attributes"]["name"],
           "search_title" => $work["work"]["searchtitle"],
-          "simplified_track_title" => worksimplifier (explode (":", $alb["name"])[0]),
+          "simplified_track_title" => worksimplifier (explode (":", $alb["attributes"]["name"])[0]),
           "similarity" => $similarity
         );
       
@@ -179,7 +137,7 @@
 
       foreach (explode (",", $work["work"]["alternatetitles"]) as $alttitle)
       {
-        similar_text ($alttitle, worksimplifier (explode (":", $alb["name"])[0]), $othersimilarity);
+        similar_text ($alttitle, worksimplifier (explode (":", $alb["attributes"]["name"])[0]), $othersimilarity);
 
         if ($othersimilarity > $similarity)
         {
@@ -195,13 +153,13 @@
 
       if ($mode == "catalogue")
       {
-        preg_match_all ('/('. str_replace (' ', '( )*', str_replace ("/", "\/", trim(end($matches[2])))). ')(( |\.))*('. str_replace (' ', '( )*', trim(end($matches[8]))). '($| |\W))/i', $alb["name"], $trmatches);
+        preg_match_all ('/('. str_replace (' ', '( )*', str_replace ("/", "\/", trim(end($matches[2])))). ')(( |\.))*('. str_replace (' ', '( )*', trim(end($matches[8]))). '($| |\W))/i', $alb["attributes"]["name"], $trmatches);
 
         if (sizeof ($trmatches[0])) 
         {
           if ($number)
           {
-            preg_match_all ('/(no\.)( )*'. str_replace("no. ", "", end($opmatches[0])). '($| |\W)/i', $alb["name"], $tropmatches);
+            preg_match_all ('/(no\.)( )*'. str_replace("no. ", "", end($opmatches[0])). '($| |\W)/i', $alb["attributes"]["name"], $tropmatches);
 
             if (sizeof ($tropmatches[0])) 
             {
@@ -223,7 +181,9 @@
         }
       }
 
-      if ($similarity > MIN_SIMILAR && slug($alb["artists"][0]["name"]) == slug($work["composer"]["complete_name"])) 
+      //echo $alb["attributes"]["name"]. " --- sim: ". $similarity. "\n";
+
+      if ($similarity > MIN_SIMILAR /*&& slug($alb["artists"][0]["name"]) == slug($work["composer"]["complete_name"])*/) 
       {
         $simwkdb = 0;
         $mostwkdb = 0;
@@ -231,9 +191,9 @@
         foreach ($wkdb as $wk)
         {
           //similar_text ($wk["title"], explode (":", $alb["name"])[0], $sim);
-          similar_text (str_replace (" ", "", $wk["searchtitle"]), str_replace (" ", "", worksimplifier (explode (":", $alb["name"])[0], $work["work"]["fullname"])), $sim);
+          similar_text (str_replace (" ", "", $wk["searchtitle"]), str_replace (" ", "", worksimplifier (explode (":", $alb["attributes"]["name"])[0], $work["work"]["fullname"])), $sim);
           
-          //if ($sim > MIN_SIMILAR) echo $wk["id"]. " - ". $sim. " - ". $wk["searchtitle"]. " - ". worksimplifier (explode (":", $alb["name"])[0], true). "\n[". $alb["name"]. "]\n\n";
+          if ($sim > MIN_SIMILAR) echo $wk["id"]. " - ". $sim. " - ". $wk["searchtitle"]. " - ". worksimplifier (explode (":", $alb["name"])[0], true). "\n[". $alb["name"]. "]\n\n";
           
           if ($sim > $simwkdb) 
           {
@@ -243,59 +203,52 @@
           }
         }
 
-        //echo "GUESSED: ". $mostwkdb. " - ". $mostwkdbtitle. "\n[". $alb["name"]. "]\n\n";
+        echo "GUESSED: ". $mostwkdb. " - ". $mostwkdbtitle. "\n[". $alb["attributes"]["name"]. "]\n\n";
         
         if ($mostwkdb == $work["work"]["id"] || $mode == "catalogue")
         {
           //echo $alb["name"]. "\n\n";
           unset ($performers);
 
+          $alb["artists"] = preg_split("/(\,|\&)/", $alb["attributes"]["artistName"]);
+
           foreach ($alb["artists"] as $kart => $art)
           {
-            if ($kart && !strpos ($art["name"], "/"))
+            if (!strpos ($art["name"], "/"))
             {
-              $performers[] = $art["name"];
+              $performers[] = trim ($art);
             }
           }
 
           if (sizeof ($performers))
           {
-            if ($alb["album"]["release_date_precision"] == "day") 
-            {
-              $year = $alb["album"]["release_date"];
-            }
-            else if ($alb["album"]["release_date_precision"] == "month") 
-            {
-              $year = $alb["album"]["release_date"]. "-01";
-            }
-            else
-            {
-              $year = $alb["album"]["release_date"]. "-01-01";
-            }
-
-            $albums[$alb["album"]["id"]][] = Array 
+            $year = $alb["attributes"]["releaseDate"];
+            
+            $apple_albumid = explode ("?", end (explode ("/", $alb["attributes"]["url"])))[0];
+            
+            $albums[$apple_albumid][] = Array 
             (
-              "similarity_between" => Array ($work["work"]["searchtitle"], worksimplifier (explode (":", $alb["name"])[0])),
+              "similarity_between" => Array ($work["work"]["searchtitle"], worksimplifier (explode (":", $alb["attributes"]["name"])[0])),
               "mostsimilar" => $similarity,
-              "full_title" => $alb["name"],
-              "title" => trim (end (explode (":", $alb["name"]))),
+              "full_title" => $alb["attributes"]["name"],
+              "title" => trim (end (explode (":", $alb["attributes"]["name"]))),
               "similarity" => $similarity,
               "work_id" => $wid,
               "year" => $year,
-              "spotify_imgurl" => $alb["album"]["images"][0]["url"],
-              "spotify_albumid" => $alb["album"]["id"],
+              "apple_imgurl" => str_replace ("{w}x{h}", "640x640", $alb["attributes"]["artwork"]["url"]),
+              "apple_albumid" => $apple_albumid,
               "performers" => $performers,
-              "tracks" => sizeof ($albums[$alb["album"]["id"]])+1
+              "tracks" => sizeof ($albums[$apple_albumid])+1
             );
 
             $tracks[] = Array 
             (
-              "full_title" => $alb["name"],
-              "title" => trim (str_replace ("(Live)", "", end (explode (":", end (explode ("/", $alb["name"])))))),
-              "cd" => $alb["disc_number"],
-              "position" => $alb["track_number"],
-              "length" => round ($alb["duration_ms"] / 1000, 0, PHP_ROUND_HALF_UP),
-              "spotify_trackid" => $alb["id"],
+              "full_title" => $alb["attributes"]["name"],
+              "title" => trim (str_replace ("(Live)", "", end (explode (":", end (explode ("/", $alb["attributes"]["name"])))))),
+              "cd" => $alb["attributes"]["discNumber"],
+              "position" => $alb["attributes"]["trackNumber"],
+              "length" => round ($alb["attributes"]["durationInMillis"] / 1000, 0, PHP_ROUND_HALF_UP),
+              "apple_trackid" => $alb["id"],
               "performers" => $performers
             );
           }
@@ -307,21 +260,21 @@
 
     $stats = Array 
       (
-        "term_used" => trim(urlencode ($search. " artist:{$work["composer"]["complete_name"]}")),
-        "spotify_responses" => count ($spalbums["tracks"]["items"]),
+        "term_used" => trim(urlencode ($search. " {$work["composer"]["complete_name"]}")),
+        "apple_responses" => count ($data),
         "useful_responses" => count (${$return}),
-        "usefulness_rate" => round(100*(count (${$return})/count ($spalbums["tracks"]["items"])), 2). "%"
+        "usefulness_rate" => round(100*(count (${$return})/count ($data)), 2). "%"
       );
 
-    if ($return == "albums" && $spalbums["tracks"]["next"])
+    if ($return == "albums" && $spalbums["results"]["songs"]["next"])
     {
-      $extras = Array ("next"=>$spalbums["tracks"]["next"]);  
+      $extras = Array ("next"=>$spalbums["results"]["songs"]["next"]);  
     }
 
     return Array ("type"=> $return, "items"=>${$return}, "stats"=>$stats, "extras"=>$extras);
   }
 
-  // add concertino own extradata to spotify metadata
+  // add concertino own extradata to apple metadata
 
   function extradata ($spot, $params)
   {
