@@ -18,7 +18,7 @@
 
     $work["recording"]["apple_albumid"] = $_REQUEST["aid"];
 
-    $apireturn["work"] = arraydelete ($work, ["fullname", "namesearch", "alternatetitles"])["work"];
+    $apireturn["work"] = $work["work"];
     $apireturn["work"]["composer"] = $work["composer"];
     
     $apireturn["recording"] = Array

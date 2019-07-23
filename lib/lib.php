@@ -14,43 +14,7 @@
     
     // catalogue or title mode?
 
-    if ($work["work"]["namesearch"])
-    {
-      $mode = "title";
-      $search = $work["work"]["searchtitle"];
-      $number = false;
-    }
-    else
-    {
-      preg_match_all (CATALOGUE_REGEX, $work["work"]["title"], $matches);
-
-      if (sizeof ($matches[0]))
-      {
-        $mode = "catalogue";
-        $search = end($matches[2]). " ". end($matches[8]);
-
-        if (strtolower (end($matches[2])) == "op" || strtolower (end($matches[2])) == "opus")
-        {
-          preg_match_all ('/(no\.)( )*([0-9])+/i', $work["work"]["title"], $opmatches);
-          
-          if (sizeof ($opmatches[0])) 
-          {
-            $search .= " ". end ($opmatches[0]);
-            $number = true;
-          }
-          else
-          {
-            $number = false;
-          }
-        }
-      }
-      else
-      { 
-        $mode = "title";
-        $search = $work["work"]["searchtitle"];
-        $number = false;
-      }
-    }
+    $mode = $work["work"]["searchmode"];
 
     // creating works titles reference
 
@@ -58,48 +22,48 @@
     {
       $wkdb = ($work["similarlytitled"] ? $work["similarlytitled"] : []);
 
-      // adding alternate titles of the work to the reference
+      // adding search terms of the work to the reference
 
-      if ($work["work"]["alternatetitles"])
+      foreach ($work["work"]["searchterms"] as $st)
       {
-        foreach (explode (",", $work["work"]["alternatetitles"]) as $alttitle)
-        {
-          $wkdb[] = Array 
-            (
-              "id" => $work["work"]["id"],
-              "title" => $work["work"]["title"],
-              "searchtitle" => $alttitle
-            );
-        }
-      }
-      
-      // adding the work itself to the top of the reference
-
-      array_unshift ($wkdb, Array 
+        array_unshift ($wkdb, Array 
           (
             "id" => $work["work"]["id"],
             "title" => $work["work"]["title"],
-            "searchtitle" => $work["work"]["searchtitle"]
+            "searchterm" => $st,
+            "similarity" => 100
           ));
+      }
     }
 
-    // searching spotify
+    // searching apple music
 
     $token = APPMUSTOKEN;
 
     if ($return == "albums")
-    {    
-      $spalbums = appledownparse (APPLEMUSICAPI. "/catalog/us/search?types=songs&offset={$offset}&limit=". APPLAPI_ITEMS. "&term=". trim(urlencode ($search. " {$work["composer"]["complete_name"]}")), $token);
-      $loop = 1;
-      //$spalbums["tracks"]["next"] = $offset + SAPI_ITEMS;
-
-      while ($spalbums["results"]["songs"]["next"] && $loop <= APPLEAPI_PAGES)
+    {  
+      foreach ($work["work"]["searchterms"] as $search)
       {
-        $morealbums = appledownparse (APPLEMUSICAPIBASE. $spalbums["results"]["songs"]["next"]. "&limit=". APPLAPI_ITEMS, $token);
+        $tspalbums = appledownparse (APPLEMUSICAPI. "/catalog/us/search?types=songs&offset={$offset}&limit=". APPLAPI_ITEMS. "&term=". trim(urlencode ($search. " {$work["composer"]["complete_name"]}")), $token);
+        $loop = 1;
+        
+        while ($tspalbums["results"]["songs"]["next"] && $loop <= APPLEAPI_PAGES)
+        {
+          $morealbums = appledownparse (APPLEMUSICAPIBASE. $tspalbums["results"]["songs"]["next"]. "&limit=". APPLAPI_ITEMS, $token);
 
-        $spalbums["results"]["songs"]["data"] = array_merge ($spalbums["results"]["songs"]["data"], $morealbums["results"]["songs"]["data"]);
-        $spalbums["results"]["songs"]["next"] = $morealbums["results"]["songs"]["next"];
-        $loop++;
+          $tspalbums["results"]["songs"]["data"] = array_merge ($tspalbums["results"]["songs"]["data"], $morealbums["results"]["songs"]["data"]);
+          $tspalbums["results"]["songs"]["next"] = $morealbums["results"]["songs"]["next"];
+          $loop++;
+        }
+
+        if ($spalbums)
+        {
+          $spalbums["results"]["songs"]["data"] = array_merge ($spalbums["results"]["songs"]["data"], $tspalbums["results"]["songs"]["data"]);
+        }
+        else
+        {
+          $spalbums = $tspalbums;
+        }
       }
 
       $data = $spalbums["results"]["songs"]["data"];
@@ -120,98 +84,59 @@
 
     foreach ($data as $kalb => $alb)
     {
+      $simwkdb = 0;
+      $mostwkdb = 0;
+      $mostwkdbtitle = "";
+      
       $alb["attributes"]["name"] = preg_replace ('/^(( )*( |\,|\(|\'|\"|\-|\;|\:)( )*)/i', '', $alb["attributes"]["name"], 1);
 
-      //similar_text ($work[0]["title"], explode (":", $alb["name"])[0], $similarity);
-      similar_text ($work["work"]["searchtitle"], worksimplifier (explode (":", $alb["attributes"]["name"])[0]), $similarity);
-
-      $albunsfound = Array 
-        (
-          "track_title" => $alb["attributes"]["name"],
-          "search_title" => $work["work"]["searchtitle"],
-          "simplified_track_title" => worksimplifier (explode (":", $alb["attributes"]["name"])[0]),
-          "similarity" => $similarity
-        );
-      
-      //if ($similarity > $spotres[$alb["album"]["id"]]["mostsimilar"] && $similarity > MIN_SIMILAR)
-
-      foreach (explode (",", $work["work"]["alternatetitles"]) as $alttitle)
+      if (stripos (str_replace ('-', '', slug($alb["attributes"]["composerName"])), str_replace ('-', '', slug($work["composer"]["name"])))) 
       {
-        similar_text ($alttitle, worksimplifier (explode (":", $alb["attributes"]["name"])[0]), $othersimilarity);
-
-        if ($othersimilarity > $similarity)
+        if ($mode == "catalogue")
         {
-          $similarity = $othersimilarity;
-        }
-      }
+          preg_match_all ('/('. str_replace (' ', '( )*', str_replace ("/", "\/", $work["work"]["catalogue"])). ')(( |\.))*('. str_replace (' ', '( )*', $work["work"]["catalogue_number"]). '($| |\W))/i', $alb["attributes"]["name"], $trmatches);
 
-      //echo slug($alb["artists"][0]["name"]). " - ". slug($work[0]["complete_name"]). "\n\n";
-      //echo "\n". slug($alb["name"]). " - ". slug($search). "\n";
-      //echo strpos (slug ($alb["name"]), slug($search)). "\n";
-      
-      //print_r ($matches);
-
-      if ($mode == "catalogue")
-      {
-        preg_match_all ('/('. str_replace (' ', '( )*', str_replace ("/", "\/", trim(end($matches[2])))). ')(( |\.))*('. str_replace (' ', '( )*', trim(end($matches[8]))). '($| |\W))/i', $alb["attributes"]["name"], $trmatches);
-
-        if (sizeof ($trmatches[0])) 
-        {
-          if ($number)
+          if (sizeof ($trmatches[0])) 
           {
-            preg_match_all ('/(no\.)( )*'. str_replace("no. ", "", end($opmatches[0])). '($| |\W)/i', $alb["attributes"]["name"], $tropmatches);
-
-            if (sizeof ($tropmatches[0])) 
+            if ($work["work"]["additional_number"])
             {
-              $similarity = 100;
+              preg_match_all ('/(no\.)( )*'. $work["work"]["additional_number"]. '($| |\W)/i', $alb["attributes"]["name"], $tropmatches);
+
+              if (sizeof ($tropmatches[0])) $mostwkdb = $work["work"]["id"];
             }
             else
             {
-              $similarity = 0;
+              $mostwkdb = $work["work"]["id"];
             }
-          }
-          else
-          {
-            $similarity = 100;
           }
         }
         else
         {
-          $similarity = 0;
-        }
-      }
+          //echo "\nTRYING: ". str_replace ('-', '', slug ($alb["attributes"]["name"]));
 
-      //echo $alb["attributes"]["name"]. " --- sim: ". $similarity. "\n";
-
-      if ($similarity > MIN_SIMILAR /*&& slug($alb["artists"][0]["name"]) == slug($work["composer"]["complete_name"])*/) 
-      {
-        $simwkdb = 0;
-        $mostwkdb = 0;
-
-        foreach ($wkdb as $wk)
-        {
-          //similar_text ($wk["title"], explode (":", $alb["name"])[0], $sim);
-          similar_text (str_replace (" ", "", $wk["searchtitle"]), str_replace (" ", "", worksimplifier (explode (":", $alb["attributes"]["name"])[0], $work["work"]["fullname"])), $sim);
-          
-          if ($sim > MIN_SIMILAR) echo $wk["id"]. " - ". $sim. " - ". $wk["searchtitle"]. " - ". worksimplifier (explode (":", $alb["name"])[0], true). "\n[". $alb["name"]. "]\n\n";
-          
-          if ($sim > $simwkdb) 
+          foreach ($wkdb as $wk)
           {
-            $simwkdb = $sim;
-            $mostwkdb = $wk["id"];
-            $mostwkdbtitle = $wk["searchtitle"];
+            similar_text (str_replace (" ", "", $wk["searchterm"]), str_replace (" ", "", worksimplifier (explode (":", $alb["attributes"]["name"])[0], true)), $sim);
+            //echo "\n [{$wk["searchterm"]}] [$sim] - ". $alb["attributes"]["name"];
+            if (stripos (str_replace ('-', '', slug ($alb["attributes"]["name"])), str_replace ('-', '', slug ($wk["searchterm"]))) !== false && $sim > $simwkdb) 
+            {
+              //echo "\n [{$wk["searchterm"]}] [$sim] - ". $alb["attributes"]["name"];
+              //echo "\nFOUND: ". $wk["searchterm"];
+              $simwkdb = $sim;
+              $mostwkdb = $wk["id"];
+              $mostwkdbtitle = $wk["searchterm"];
+            }
           }
+  
+          //echo "\nGUESSED: ". $mostwkdb. " - ". $mostwkdbtitle. " [". $alb["attributes"]["name"]. "]";
         }
-
-        echo "GUESSED: ". $mostwkdb. " - ". $mostwkdbtitle. "\n[". $alb["attributes"]["name"]. "]\n\n";
         
-        if ($mostwkdb == $work["work"]["id"] || $mode == "catalogue")
+        if ($mostwkdb == $work["work"]["id"])
         {
           //echo $alb["name"]. "\n\n";
           unset ($performers);
 
           $alb["artists"] = preg_split("/(\,|\&)/", $alb["attributes"]["artistName"]);
-
           foreach ($alb["artists"] as $kart => $art)
           {
             if (!strpos ($art["name"], "/"))
@@ -240,7 +165,6 @@
               "performers" => $performers,
               "tracks" => sizeof ($albums[$apple_albumid])+1
             );
-
             $tracks[] = Array 
             (
               "full_title" => $alb["attributes"]["name"],
@@ -255,12 +179,13 @@
 
           $mostsimilar = $similarity;
         }
+        //else echo "\nREJECTED:". str_replace ('-', '', slug ($alb["attributes"]["name"]));
       }
+      //else echo "\nComposer Error -- ". slug($alb["attributes"]["composerName"]). " == ". slug($work["composer"]["name"]);
     }
 
     $stats = Array 
       (
-        "term_used" => trim(urlencode ($search. " {$work["composer"]["complete_name"]}")),
         "apple_responses" => count ($data),
         "useful_responses" => count (${$return}),
         "usefulness_rate" => round(100*(count (${$return})/count ($data)), 2). "%"
