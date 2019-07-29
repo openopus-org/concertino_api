@@ -3,7 +3,7 @@
 
   // try to find the recording
 
-  $recordings = mysqlfetch ($mysql, "select concat(recording.work_id,'-',recording.spotify_albumid,'-',recording.subset) as id, recording.observation as observation, recording.subset, recording.spotify_albumid, recording.work_id as work, spotify_imgurl as cover, performer, role from recording, recording_performer, user_recording where user_recording.user_id = '{$_REQUEST["id"]}' and user_recording.work_id = recording.work_id and user_recording.spotify_albumid = recording.spotify_albumid and user_recording.subset = recording.subset and recording_performer.work_id = recording.work_id and recording_performer.subset = recording.subset and recording_performer.spotify_albumid = recording.spotify_albumid and user_recording.favorite = 1 order by work asc, recording.spotify_albumid asc, recording.subset asc");
+  $recordings = mysqlfetch ($mysql, "select concat(recording.work_id,'-',recording.apple_albumid,'-',recording.subset) as id, recording.observation as observation, recording.subset, recording.apple_albumid, recording.work_id as work, apple_imgurl as cover, performer, role from recording, recording_performer, user_recording where user_recording.user_id = '{$_REQUEST["id"]}' and user_recording.work_id = recording.work_id and user_recording.apple_albumid = recording.apple_albumid and user_recording.subset = recording.subset and recording_performer.work_id = recording.work_id and recording_performer.subset = recording.subset and recording_performer.apple_albumid = recording.apple_albumid and user_recording.favorite = 1 order by work asc, recording.apple_albumid asc, recording.subset asc");
 
   if (!$recordings)
   {
@@ -33,7 +33,7 @@
         
         $apireturn["recordings"][$vid] = Array
           (
-            "spotify_albumid" => $rec["spotify_albumid"],
+            "apple_albumid" => $rec["apple_albumid"],
             "set" => $rec["subset"],
             "cover" => $rec["cover"],
             "observation" => $rec["observation"]
@@ -68,7 +68,7 @@
     
     foreach ($apireturn["recordings"] as $rec)
     {
-      $apireturn["list"][] = $rec["work"]["id"]. "-". $rec["spotify_albumid"]. "-". $rec["set"];
+      $apireturn["list"][] = $rec["work"]["id"]. "-". $rec["apple_albumid"]. "-". $rec["set"];
     }
   }
 

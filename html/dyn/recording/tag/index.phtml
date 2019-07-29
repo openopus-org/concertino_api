@@ -28,11 +28,11 @@
 
     // updating the recording 
 
-    $query = "update recording set ". implode (",", $set). " where work_id = '{$_REQUEST["wid"]}' and spotify_albumid = '{$_REQUEST["aid"]}' and subset = '{$_REQUEST["set"]}'";
+    $query = "update recording set ". implode (",", $set). " where work_id = '{$_REQUEST["wid"]}' and apple_albumid = '{$_REQUEST["aid"]}' and subset = '{$_REQUEST["set"]}'";
     mysqli_query ($mysql, $query);
 
     $apireturn["status"]["success"] = "true";
-    $apireturn["recording"] = Array ("work_id"=>$_REQUEST["wid"], "spotify_albumid"=>$_REQUEST["aid"], "set"=>$_REQUEST["set"], $_REQUEST["tag"] => 1);
+    $apireturn["recording"] = Array ("work_id"=>$_REQUEST["wid"], "apple_albumid"=>$_REQUEST["aid"], "set"=>$_REQUEST["set"], $_REQUEST["tag"] => 1);
 
     shell_exec ("rm -rf ". WEBDIR. "/recording/list/work/{$_REQUEST["wid"]}/");
     shell_exec ("rm -rf ". WEBDIR. "/recording/detail/work/{$_REQUEST["wid"]}/album/{$_REQUEST["aid"]}/");

@@ -25,11 +25,10 @@
 
     define ("SOFTWAREMAIL", "adminmail@gmail.com"); // server admin email address
 
-    // spotify 
+    // apple music 
 
-    define ("SPOTIFYID", "lots of letters and numbers"); // spotify dev account id
-    define ("SPOTIFYSECRET", "lots of letters and numbers"); // spotify dev account secret string
-
+    define ("APPMUSTOKEN", "lots of letters and numbers"); // apple music dev token
+   
     // debug
 
     define ("NOCACHE", false); // true will stop caching api results - useful for debugging

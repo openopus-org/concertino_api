@@ -12,14 +12,14 @@
   {
     // select the shorted url for the recording
 
-    $query = "select id from shortrec where work_id = '{$_REQUEST["wid"]}' and spotify_albumid = '{$_REQUEST["aid"]}' and subset = '{$_REQUEST["set"]}'";
+    $query = "select id from shortrec where work_id = '{$_REQUEST["wid"]}' and apple_albumid = '{$_REQUEST["aid"]}' and subset = '{$_REQUEST["set"]}'";
     $id = mysqlfetch ($mysql, $query);
 
     // it doesn't exit, so... inserting the recording into the short urls table
 
     if (!$id)
     {
-        $query = "insert into shortrec (work_id, spotify_albumid, subset) values ('{$_REQUEST["wid"]}', '{$_REQUEST["aid"]}', '{$_REQUEST["set"]}')";
+        $query = "insert into shortrec (work_id, apple_albumid, subset) values ('{$_REQUEST["wid"]}', '{$_REQUEST["aid"]}', '{$_REQUEST["set"]}')";
         mysqli_query ($mysql, $query);
         $retid = mysqli_insert_id ($mysql);
         $status = "insert";
@@ -31,7 +31,7 @@
     }
 
     $apireturn["status"]["success"] = "true";
-    $apireturn["recording"] = Array ("work_id"=>$_REQUEST["wid"], "spotify_albumid"=>$_REQUEST["aid"], "set"=>$_REQUEST["set"], "id" => strval ($retid), "operation" => $status);
+    $apireturn["recording"] = Array ("work_id"=>$_REQUEST["wid"], "apple_albumid"=>$_REQUEST["aid"], "set"=>$_REQUEST["set"], "id" => strval ($retid), "operation" => $status);
   }
 
   echo savecache ("/recording/shorturl/work/{$_REQUEST["wid"]}/album/{$_REQUEST["aid"]}/{$_REQUEST["set"]}.json", apireturn ($apireturn));

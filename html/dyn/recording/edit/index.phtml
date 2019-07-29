@@ -29,7 +29,7 @@
     $where = Array 
     (
       "work_id" => $_REQUEST["wid"],
-      "spotify_albumid" => $_REQUEST["aid"],
+      "apple_albumid" => $_REQUEST["aid"],
       "subset" => $_REQUEST["set"]
     );
 
@@ -41,7 +41,7 @@
     {
       // deleting performers
 
-      mysqli_query ($mysql, "delete from recording_performer where work_id={$_REQUEST["wid"]} and spotify_albumid='{$_REQUEST["aid"]}' and subset={$_REQUEST["set"]}");
+      mysqli_query ($mysql, "delete from recording_performer where work_id={$_REQUEST["wid"]} and apple_albumid='{$_REQUEST["aid"]}' and subset={$_REQUEST["set"]}");
 
       // inserting performers
 
@@ -55,7 +55,7 @@
         }
         else
         {
-          $inss[] = array_merge (["work_id" => $_REQUEST["wid"], "spotify_albumid" => $_REQUEST["aid"], "subset" => $_REQUEST["set"]], $inperformers);
+          $inss[] = array_merge (["work_id" => $_REQUEST["wid"], "apple_albumid" => $_REQUEST["aid"], "subset" => $_REQUEST["set"]], $inperformers);
         }
       }
 
@@ -66,7 +66,7 @@
 
         foreach ($performerstoguess as $pftog)
         {
-          $inss[] = ["work_id" => $_REQUEST["wid"], "spotify_albumid" => $_REQUEST["aid"], "subset" => $_REQUEST["set"], "performer" => $pftog, "role" => $rldb[slug ($pftog)]];
+          $inss[] = ["work_id" => $_REQUEST["wid"], "apple_albumid" => $_REQUEST["aid"], "subset" => $_REQUEST["set"], "performer" => $pftog, "role" => $rldb[slug ($pftog)]];
         }
       }
 
@@ -93,7 +93,7 @@
 
     $apireturn["status"]["success"] = "true";
     $apireturn["work"]["id"] = $_REQUEST["wid"];
-    $apireturn["recording"] = ["spotify_albumid" => $_REQUEST["aid"], "subset" => $_REQUEST["set"]];
+    $apireturn["recording"] = ["apple_albumid" => $_REQUEST["aid"], "subset" => $_REQUEST["set"]];
     if ($_REQUEST["observation"]) $apireturn["recording"]["observation"] = $_REQUEST["observationvalue"];
     if ($_REQUEST["performers"]) $apireturn["recording"]["performers"] = arrayrenamekey (arraykeep ($inss, ["performer", "role"]), "performer", "name");
     if ($_REQUEST["tracks"]) $apireturn["recording"]["tracks"] = $intracks;      

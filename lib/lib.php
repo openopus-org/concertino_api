@@ -207,17 +207,17 @@
 
     if ($params["aid"])
     {
-      $where = "work_id={$params["wid"]} and spotify_albumid='{$params["aid"]}' and subset={$params["set"]}";
+      $where = "work_id={$params["wid"]} and apple_albumid='{$params["aid"]}' and subset={$params["set"]}";
     }
     else
     {
       $where = "work_id={$params["wid"]}";
     }
 
-    $extrarecordings = mysqlfetch ($mysql, "select ifnull(observation,'') observation, spotify_imgurl, spotify_albumid, subset, year, recommended, compilation, oldaudio, verified, wrongdata, spam, badquality from recording where ". $where);
-    $extraperformers = mysqlfetch ($mysql, "select spotify_albumid, subset, performer, role from recording_performer where " . $where . " order by spotify_albumid asc, subset asc");
+    $extrarecordings = mysqlfetch ($mysql, "select ifnull(observation,'') observation, apple_imgurl, apple_albumid, subset, year, recommended, compilation, oldaudio, verified, wrongdata, spam, badquality from recording where ". $where);
+    $extraperformers = mysqlfetch ($mysql, "select apple_albumid, subset, performer, role from recording_performer where " . $where . " order by apple_albumid asc, subset asc");
 
-    if ($params["aid"]) $extratracks = mysqlfetch ($mysql, "select cd, position, length, title, spotify_trackid from track where " . $where . " order by spotify_albumid asc, subset asc, cd asc, position asc");
+    if ($params["aid"]) $extratracks = mysqlfetch ($mysql, "select cd, position, length, title, apple_trackid from track where " . $where . " order by apple_albumid asc, subset asc, cd asc, position asc");
 
     if ($extratracks)
     {
@@ -235,27 +235,27 @@
       }
       else
       {
-        if ($ed["subset"] > 1 || ($ed["verified"] && !sizeof ($spot["items"][$ed["spotify_albumid"]])))
+        if ($ed["subset"] > 1 || ($ed["verified"] && !sizeof ($spot["items"][$ed["apple_albumid"]])))
         {
-          $spot["items"]["{$ed["spotify_albumid"]}-{$ed["subset"]}"][0] = $ed;
-          $spot["items"]["{$ed["spotify_albumid"]}-{$ed["subset"]}"][0]["tracks"] = 2;
+          $spot["items"]["{$ed["apple_albumid"]}-{$ed["subset"]}"][0] = $ed;
+          $spot["items"]["{$ed["apple_albumid"]}-{$ed["subset"]}"][0]["tracks"] = 2;
         }
         else 
         {
-          $pos = sizeof ($spot["items"][$ed["spotify_albumid"]]) - 1;
+          $pos = sizeof ($spot["items"][$ed["apple_albumid"]]) - 1;
 
           if ($pos >= 0)
           {
-            if ($ed["observation"]) $spot["items"][$ed["spotify_albumid"]][$pos]["observation"] = $ed["observation"];
-            if ($ed["year"]) $spot["items"][$ed["spotify_albumid"]][$pos]["year"] = $ed["year"];
-            if ($ed["compilation"]) $spot["items"][$ed["spotify_albumid"]][$pos]["compilation"] = true;
-            if ($ed["oldaudio"]) $spot["items"][$ed["spotify_albumid"]][$pos]["historic"] = true;
-            if ($ed["verified"]) $spot["items"][$ed["spotify_albumid"]][$pos]["verified"] = true;
-            if ($ed["recommended"]) $spot["items"][$ed["spotify_albumid"]][$pos]["recommended"] = true;
+            if ($ed["observation"]) $spot["items"][$ed["apple_albumid"]][$pos]["observation"] = $ed["observation"];
+            if ($ed["year"]) $spot["items"][$ed["apple_albumid"]][$pos]["year"] = $ed["year"];
+            if ($ed["compilation"]) $spot["items"][$ed["apple_albumid"]][$pos]["compilation"] = true;
+            if ($ed["oldaudio"]) $spot["items"][$ed["apple_albumid"]][$pos]["historic"] = true;
+            if ($ed["verified"]) $spot["items"][$ed["apple_albumid"]][$pos]["verified"] = true;
+            if ($ed["recommended"]) $spot["items"][$ed["apple_albumid"]][$pos]["recommended"] = true;
 
             if ($ed["badquality"] || $ed["wrongdata"] || $ed["spam"]) 
             {
-              unset ($spot["items"][$ed["spotify_albumid"]]);
+              unset ($spot["items"][$ed["apple_albumid"]]);
             }
           }
         }
@@ -272,15 +272,15 @@
       }
       else
       {
-        if ($ep["subset"] > 1 || $spot["items"]["{$ep["spotify_albumid"]}-{$ep["subset"]}"][0]["verified"])
+        if ($ep["subset"] > 1 || $spot["items"]["{$ep["apple_albumid"]}-{$ep["subset"]}"][0]["verified"])
         {
-          $spot["items"]["{$ep["spotify_albumid"]}-{$ep["subset"]}"][0]["extraperformers"][] = $array;
+          $spot["items"]["{$ep["apple_albumid"]}-{$ep["subset"]}"][0]["extraperformers"][] = $array;
         }
         else
         {
-          $pos = sizeof ($spot["items"][$ep["spotify_albumid"]]) - 1;
+          $pos = sizeof ($spot["items"][$ep["apple_albumid"]]) - 1;
           
-          if ($pos >= 0) $spot["items"][$ep["spotify_albumid"]][$pos]["extraperformers"][] = $array;
+          if ($pos >= 0) $spot["items"][$ep["apple_albumid"]][$pos]["extraperformers"][] = $array;
         }
       }
     }
@@ -294,7 +294,7 @@
   {
     global $mysql;
 
-    $query = "insert into recording (work_id, spotify_albumid, subset, spotify_imgurl) values ('{$request["wid"]}', '{$request["aid"]}', '{$request["set"]}', '{$request["cover"]}')";
+    $query = "insert into recording (work_id, apple_albumid, subset, apple_imgurl) values ('{$request["wid"]}', '{$request["aid"]}', '{$request["set"]}', '{$request["cover"]}')";
     mysqli_query ($mysql, $query);
 
     // inserting performers into the recording abstract database
@@ -305,7 +305,7 @@
 
       foreach ($performers as $pk => $pf)
       {
-        $nperfs[] = Array ("performer"=>$pf["name"], "role"=>$pf["role"], "work_id"=>$request["wid"], "spotify_albumid"=>$request["aid"], "subset"=>$request["set"]);
+        $nperfs[] = Array ("performer"=>$pf["name"], "role"=>$pf["role"], "work_id"=>$request["wid"], "apple_albumid"=>$request["aid"], "subset"=>$request["set"]);
       }
 
       mysqlmultinsert ($mysql, "recording_performer", $nperfs);
