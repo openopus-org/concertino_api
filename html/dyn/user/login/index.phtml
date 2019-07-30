@@ -15,26 +15,33 @@
     $_REQUEST["recid"] = mysqli_real_escape_string ($mysql, $_REQUEST["recid"]);
     $auth = md5 ($_REQUEST["recid"]. "-". HASH_SALT);
 
+    // if the request has an id and it fails the authentication, ignores it
+
+    if ($_REQUEST["id"] && !simpleauth ($mysql, $_REQUEST["id"], $_REQUEST["auth"])) $_REQUEST["id"] = 0;
+
     if ($_REQUEST["id"])
     {
       // updating apple recommendation id in the concertino db
 
-      $query = "update user set auth='$auth', apple_recid = '{$_REQUEST["recid"]}', lastlogin='". time(). "' where id = '{$_REQUEST["id"]}'";
+      $query = "update user set apple_recid = '{$_REQUEST["recid"]}', lastlogin='". time(). "' where id = '{$_REQUEST["id"]}'";
       mysqli_query ($mysql, $query);
 
       $apireturn["status"]["success"] = "true";
-      $apireturn["user"] = Array ("apple_recid" => $_REQUEST["recid"], "id" => $_REQUEST["id"], "auth" => $auth);
+      $apireturn["user"] = Array ("apple_recid" => $_REQUEST["recid"], "id" => $_REQUEST["id"]);
+      
     }
     else
     {
       // registering the user to the concertino db
 
       $query = "insert into user (auth, apple_recid, lastlogin) values ('$auth', '{$_REQUEST["recid"]}', '". time(). "')
-                on duplicate key update id=id, auth='$auth', apple_recid='{$_REQUEST["recid"]}', lastlogin=". time();
+                on duplicate key update id=id, apple_recid='{$_REQUEST["recid"]}', lastlogin=". time();
       mysqli_query ($mysql, $query);
+      $uid = mysqli_insert_id ($mysql);
 
       $apireturn["status"]["success"] = "true";
-      $apireturn["user"] = Array ("apple_recid" => $_REQUEST["recid"], "id" => mysqli_insert_id ($mysql), "auth" => $auth);
+      $udb = mysqlfetch ($mysql, "select auth from user where id='$uid'");
+      $apireturn["user"] = Array ("apple_recid" => $_REQUEST["recid"], "id" => $uid, "auth" => $udb[0]["auth"]);      
     }
   }
 
