@@ -15,7 +15,7 @@
   {
     // playlist details
 
-    $query = "select playlist.id as id, playlist.name as name, user.name as owner, user.id as owner_id from playlist, user where user_id=user.id and playlist.id = '{$_REQUEST["id"]}'";
+    $query = "select playlist.id as id, playlist.name as name, user.id as owner_id from playlist, user where user_id=user.id and playlist.id = '{$_REQUEST["id"]}'";
     $playlist = mysqlfetch ($mysql, $query);
     $apireturn["playlist"] = Array 
       (
@@ -23,8 +23,7 @@
         "name" => $playlist[0]["name"],
         "owner" => Array 
           (
-            "id" => $playlist[0]["owner_id"],
-            "name" => $playlist[0]["owner"]
+            "id" => $playlist[0]["owner_id"]
           )
       );
 
