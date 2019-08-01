@@ -75,7 +75,7 @@
       $extras = Array 
         (
           "label" => $spalbums["data"][0]["attributes"]["recordLabel"],
-          "cover" => str_replace ("{w}x{h}", "640x640", $spalbums["data"][0]["attributes"]["artwork"]["url"]),
+          "cover" => str_replace ("{w}x{h}", "320x320", $spalbums["data"][0]["attributes"]["artwork"]["url"]),
           "year" => $spalbums["data"][0]["attributes"]["releaseDate"]
         );
 
@@ -160,7 +160,7 @@
               "similarity" => $similarity,
               "work_id" => $wid,
               "year" => $year,
-              "apple_imgurl" => str_replace ("{w}x{h}", "640x640", $alb["attributes"]["artwork"]["url"]),
+              "apple_imgurl" => str_replace ("{w}x{h}", "320x320", $alb["attributes"]["artwork"]["url"]),
               "apple_albumid" => $apple_albumid,
               "performers" => $performers,
               "tracks" => sizeof ($albums[$apple_albumid])+1
