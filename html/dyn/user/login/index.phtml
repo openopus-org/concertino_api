@@ -21,14 +21,16 @@
 
     if ($_REQUEST["id"])
     {
-      // updating apple recommendation id in the concertino db
+      // if not guest, update apple recommendation id in the concertino db
 
-      $query = "update user set apple_recid = '{$_REQUEST["recid"]}', lastlogin='". time(). "' where id = '{$_REQUEST["id"]}'";
-      mysqli_query ($mysql, $query);
-
+      if (!stristr ($_REQUEST["recid"], "guest"))
+      {
+        $query = "update user set apple_recid = '{$_REQUEST["recid"]}', lastlogin='". time(). "' where id = '{$_REQUEST["id"]}'";
+        mysqli_query ($mysql, $query);
+      }
+      
       $apireturn["status"]["success"] = "true";
       $apireturn["user"] = Array ("apple_recid" => $_REQUEST["recid"], "id" => $_REQUEST["id"]);
-      
     }
     else
     {
