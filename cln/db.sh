@@ -1,5 +1,5 @@
 #!/bin/bash
-rm "$BASEHTMLDIR"/composer -rf
-rm "$BASEHTMLDIR"/genre -rf
-rm "$BASEHTMLDIR"/recording -rf
-rm "$BASEHTMLDIR"/work -rf
+rm "$CTINHTMLDIR"/composer -rf
+rm "$CTINHTMLDIR"/genre -rf
+rm "$CTINHTMLDIR"/recording -rf
+rm "$CTINHTMLDIR"/work -rf

@@ -1,2 +1,2 @@
 #!/bin/bash
-rm "$BASEHTMLDIR"/user -rf
+rm "$CTINHTMLDIR"/user -rf

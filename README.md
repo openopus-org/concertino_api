@@ -31,7 +31,7 @@ vim /etc/environment
 ```
 
 ```bash
-export BASEHTMLDIR="/var/www/concertino_api/html"
+export CTINHTMLDIR="/var/www/concertino_api/html"
 ```
 
 5. Update crontab for root
