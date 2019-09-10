@@ -90,7 +90,7 @@
       
       $alb["attributes"]["name"] = preg_replace ('/^(( )*( |\,|\(|\'|\"|\-|\;|\:)( )*)/i', '', $alb["attributes"]["name"], 1);
 
-      if (stripos (str_replace ('-', '', slug($alb["attributes"]["composerName"])), str_replace ('-', '', slug($work["composer"]["name"])))) 
+      if (substr_count (str_replace ('-', '', slug($alb["attributes"]["composerName"])), str_replace ('-', '', slug($work["composer"]["name"])))) 
       {
         if ($mode == "catalogue")
         {
