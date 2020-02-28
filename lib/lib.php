@@ -151,7 +151,7 @@
             
             $apple_albumid = explode ("?", end (explode ("/", $alb["attributes"]["url"])))[0];
             
-            $albums[$apple_albumid][] = Array 
+            $albums[$apple_albumid]["trid:". $alb["attributes"]["playParams"]["id"]] = Array 
             (
               "similarity_between" => Array ($work["work"]["searchtitle"], worksimplifier (explode (":", $alb["attributes"]["name"])[0])),
               "mostsimilar" => $similarity,
@@ -163,7 +163,7 @@
               "apple_imgurl" => str_replace ("{w}x{h}", "320x320", $alb["attributes"]["artwork"]["url"]),
               "apple_albumid" => $apple_albumid,
               "performers" => $performers,
-              "tracks" => sizeof ($albums[$apple_albumid])+1
+              "tracks" => (isset ($albums[$apple_albumid]["trid:". $alb["attributes"]["playParams"]["id"]]) ? sizeof ($albums[$apple_albumid]) : sizeof ($albums[$apple_albumid])+1)
             );
             $tracks[] = Array 
             (
