@@ -151,24 +151,23 @@
             
             $apple_albumid = explode ("?", end (explode ("/", $alb["attributes"]["url"])))[0];
             
-            if ($apple_albumid) 
-            {
-              $albums[$apple_albumid]["trid:". $alb["attributes"]["playParams"]["id"]] = Array 
-              (
-                "similarity_between" => Array ($work["work"]["searchtitle"], worksimplifier (explode (":", $alb["attributes"]["name"])[0])),
-                "mostsimilar" => $similarity,
-                "full_title" => $alb["attributes"]["name"],
-                "title" => trim (end (explode (":", $alb["attributes"]["name"]))),
-                "similarity" => $similarity,
-                "work_id" => $wid,
-                "year" => $year,
-                "apple_imgurl" => str_replace ("{w}x{h}", "320x320", $alb["attributes"]["artwork"]["url"]),
-                "apple_albumid" => $apple_albumid,
-                "performers" => $performers,
-                "tracks" => (isset ($albums[$apple_albumid]["trid:". $alb["attributes"]["playParams"]["id"]]) ? sizeof ($albums[$apple_albumid]) : sizeof ($albums[$apple_albumid])+1)
-              );
-            }
+            $albums[$apple_albumid][] = Array 
+            (
+              "similarity_between" => Array ($work["work"]["searchtitle"], worksimplifier (explode (":", $alb["attributes"]["name"])[0])),
+              "mostsimilar" => $similarity,
+              "full_title" => $alb["attributes"]["name"],
+              "title" => trim (end (explode (":", $alb["attributes"]["name"]))),
+              "similarity" => $similarity,
+              "work_id" => $wid,
+              "year" => $year,
+              "apple_imgurl" => str_replace ("{w}x{h}", "320x320", $alb["attributes"]["artwork"]["url"]),
+              "apple_albumid" => $apple_albumid,
+              "performers" => $performers,
+              "tracks" => (in_array ($alb["attributes"]["playParams"]["id"], $usedtracks) ? sizeof ($albums[$apple_albumid]) : sizeof ($albums[$apple_albumid])+1)
+            );
             
+            $usedtracks[] = $alb["attributes"]["playParams"]["id"];
+
             $tracks[] = Array 
             (
               "full_title" => $alb["attributes"]["name"],
