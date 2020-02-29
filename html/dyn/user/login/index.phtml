@@ -30,7 +30,7 @@
       }
       
       $apireturn["status"]["success"] = "true";
-      $apireturn["user"] = Array ("apple_recid" => $_REQUEST["recid"], "id" => $_REQUEST["id"]);
+      $apireturn["user"] = Array ("apple_recid" => $_REQUEST["recid"], "id" => (Integer) $_REQUEST["id"]);
     }
     else
     {
