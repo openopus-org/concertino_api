@@ -1,0 +1,57 @@
+<?
+  include_once ("../../../../lib/inc.php");
+
+  // sanity check
+
+  if (!postcheck ($_REQUEST, ["token"]))
+  {
+    $apireturn["status"]["success"] = "false";
+    $apireturn["status"]["error"] = "Missing fields";
+  }
+  else
+  {
+    //// getting apple recommendation id
+
+    $recres = appledownparse (APPLEMUSICAPI. "/me/recommendations", APPMUSTOKEN, $_REQUEST["token"]);
+    $_REQUEST["recid"] = $recres["data"][0]["id"];
+
+    //// logging in
+
+    // generating auth code
+
+    $_REQUEST["recid"] = mysqli_real_escape_string ($mysql, $_REQUEST["recid"]);
+    $auth = md5 ($_REQUEST["recid"]. "-". HASH_SALT);
+
+    // if the request has an id and it fails the authentication, ignores it
+
+    if ($_REQUEST["id"] && !simpleauth ($mysql, $_REQUEST["id"], $_REQUEST["auth"])) $_REQUEST["id"] = 0;
+
+    if ($_REQUEST["id"])
+    {
+      // if not guest, update apple recommendation id in the concertino db
+
+      if (!stristr ($_REQUEST["recid"], "guest"))
+      {
+        $query = "update user set apple_recid = '{$_REQUEST["recid"]}', lastlogin='". time(). "' where id = '{$_REQUEST["id"]}'";
+        mysqli_query ($mysql, $query);
+      }
+      
+      $apireturn["status"]["success"] = "true";
+      $apireturn["user"] = Array ("apple_recid" => $_REQUEST["recid"], "id" => (Integer) $_REQUEST["id"]);
+    }
+    else
+    {
+      // registering the user to the concertino db
+
+      $query = "insert into user (auth, apple_recid, lastlogin) values ('$auth', '{$_REQUEST["recid"]}', '". time(). "')
+                on duplicate key update id=id, apple_recid='{$_REQUEST["recid"]}', lastlogin=". time();
+      mysqli_query ($mysql, $query);
+      $uid = mysqli_insert_id ($mysql);
+
+      $apireturn["status"]["success"] = "true";
+      $udb = mysqlfetch ($mysql, "select auth from user where id='$uid'");
+      $apireturn["user"] = Array ("apple_recid" => $_REQUEST["recid"], "id" => $uid, "auth" => $udb[0]["auth"]);      
+    }
+  }
+
+  echo apireturn ($apireturn);

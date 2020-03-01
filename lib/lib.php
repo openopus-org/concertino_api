@@ -1,9 +1,9 @@
 <?
   // api wrapers
 
-  function appledownparse ($url, $token)
+  function appledownparse ($url, $token, $usertoken = "")
   {
-    return apidownparse ($url, "json", $token);
+    return apidownparse ($url, "json", $token, $usertoken);
   }
 
   // fetch and analyze apple music metadata
