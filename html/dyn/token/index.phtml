@@ -1,0 +1,7 @@
+<?
+  include_once ("../../../lib/inc.php");
+
+  $apireturn["status"]["success"] = "true";
+  $apireturn["token"] = APPMUSTOKEN;
+
+  echo savecache ("/token.json", apireturn ($apireturn));

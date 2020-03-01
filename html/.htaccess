@@ -42,5 +42,8 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule user/(.*)/composer/(.*)/work/fav.json dyn/user/work/fav.phtml?uid=$1&cid=$2 [L]
 
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule user/(.*)/composer/(.*)/work/fav/search/(.*).json dyn/user/work/fav.phtml?uid=$1&cid=$2&search=$3 [L]     
+RewriteRule user/(.*)/composer/(.*)/work/fav/search/(.*).json dyn/user/work/fav.phtml?uid=$1&cid=$2&search=$3 [L] 
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule token.json dyn/token/index.phtml [L]
 </IfModule>
