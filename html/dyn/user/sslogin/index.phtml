@@ -50,8 +50,17 @@
 
       $apireturn["status"]["success"] = "true";
       $udb = mysqlfetch ($mysql, "select auth from user where id='$uid'");
-      $apireturn["user"] = Array ("apple_recid" => $_REQUEST["recid"], "id" => $uid, "auth" => $udb[0]["auth"]);      
+      $apireturn["user"] = Array ("apple_recid" => $_REQUEST["recid"], "id" => $uid, "auth" => $udb[0]["auth"]); 
+
+      $_REQUEST["id"] = $uid;
     }
+
+    // retrieving user's lists 
+
+    $apireturn["works"] = worklist ($_REQUEST["id"]);
+    $apireturn["favorite"] = composerlist ("favorite", $_REQUEST["id"]);
+    $apireturn["forbidden"] = composerlist ("forbidden", $_REQUEST["id"]);
+    $apireturn["playlists"] = playlists ($_REQUEST["id"]);
   }
 
   echo apireturn ($apireturn);
