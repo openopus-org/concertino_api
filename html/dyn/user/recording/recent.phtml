@@ -37,7 +37,6 @@
             "observation" => $rec["observation"],
             "verified" => $rec["verified"]
           );
-        $id = $id + 1;
       }
 
       $apireturn["recordings"][$id]["performers"][] = Array ("name"=>$rec["performer"],"role"=>$rec["role"]);
@@ -56,6 +55,7 @@
         );
 
       $lastid = $rec["id"];
+      $id = $id + 1;
     }
   }
 
