@@ -23,12 +23,12 @@
     }
 
     $obworks = openopusdownparse ("work/list/{$_REQUEST["cid"]}/ids/". implode (",", array_unique ($worklist)). ".json");
+    $id = 0;
 
     foreach ($recordings as $rec)
     {
       if ($lastid != $rec["id"])
       {
-        $id = $id + 1;
         $apireturn["recordings"][$id] = Array
           (
             "apple_albumid" => $rec["apple_albumid"],
@@ -37,6 +37,7 @@
             "observation" => $rec["observation"],
             "verified" => $rec["verified"]
           );
+        $id = $id + 1;
       }
 
       $apireturn["recordings"][$id]["performers"][] = Array ("name"=>$rec["performer"],"role"=>$rec["role"]);
