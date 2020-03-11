@@ -25,7 +25,7 @@
     $wid = $work["work"]["id"];
     $ii = -1;
 
-    $spot = fetchapple ($work, "albums", $_REQUEST["offset"]);
+    $spot = fetchapple ($work, "albums", $_REQUEST["offset"], $_REQUEST["limitpage"]);
 
     $allperfs = [];
 
