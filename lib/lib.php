@@ -8,13 +8,20 @@
 
   // fetch and analyze apple music metadata
 
-  function fetchapple ($work, $return, $offset = 0, $pagelimit = 0)
+  function fetchapple ($work, $return, $offset = 0, $pagelimit = 0, $country = "us")
   {
     global $mysql;
     
     // catalogue or title mode?
 
     $mode = $work["work"]["searchmode"];
+
+    // enforce default country
+
+    if (!$country)
+    {
+      $country = "us";
+    }
 
     // creating works titles reference
 
@@ -44,7 +51,7 @@
     {  
       foreach ($work["work"]["searchterms"] as $search)
       {
-        $tspalbums = appledownparse (APPLEMUSICAPI. "/catalog/us/search?types=songs&offset={$offset}&limit=". APPLAPI_ITEMS. "&term=". trim(urlencode ($search. " {$work["composer"]["complete_name"]}")), $token);
+        $tspalbums = appledownparse (APPLEMUSICAPI. "/catalog/{$country}/search?types=songs&offset={$offset}&limit=". APPLAPI_ITEMS. "&term=". trim(urlencode ($search. " {$work["composer"]["complete_name"]}")), $token);
         $loop = 1;
         
         while ($tspalbums["results"]["songs"]["next"] && $loop <= ($pagelimit ? $pagelimit : APPLEAPI_PAGES))
@@ -70,7 +77,7 @@
     }
     else if ($return == "tracks")
     {
-      $spalbums = appledownparse (APPLEMUSICAPI. "/catalog/us/albums/". $work["recording"]["apple_albumid"], $token);
+      $spalbums = appledownparse (APPLEMUSICAPI. "/catalog/{$country}/albums/". $work["recording"]["apple_albumid"], $token);
       
       $extras = Array 
         (

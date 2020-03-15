@@ -25,7 +25,7 @@
     $wid = $work["work"]["id"];
     $ii = -1;
 
-    $spot = fetchapple ($work, "albums", $_REQUEST["offset"], $_REQUEST["limitpage"]);
+    $spot = fetchapple ($work, "albums", $_REQUEST["offset"], $_REQUEST["limitpage"], $_REQUEST["country"]);
 
     $allperfs = [];
 
@@ -86,7 +86,7 @@
 
     if (isset ($apireturn["recordings"]))
     {
-      $apireturn["status"] = Array ("success"=>"true", "stats"=> $spot["stats"]);
+      $apireturn["status"] = Array ("success"=>"true", "stats"=> $spot["stats"], "country"=>($_REQUEST["country"] ? $_REQUEST["country"] : "us"));
       $apireturn = compilationdigest ($apireturn);
     }
     else
@@ -96,4 +96,11 @@
     }
   }
 
-  echo savecache ("/recording/list/work/{$_REQUEST["id"]}/{$_REQUEST["offset"]}.json", apireturn ($apireturn));
+  if ($_REQUEST["country"])
+  {
+    echo savecache ("/recording/{$_REQUEST["country"]}/list/work/{$_REQUEST["id"]}/{$_REQUEST["offset"]}.json", apireturn ($apireturn));
+  }
+  else
+  {
+    echo savecache ("/recording/list/work/{$_REQUEST["id"]}/{$_REQUEST["offset"]}.json", apireturn ($apireturn));
+  }

@@ -32,15 +32,15 @@
     // fetching data from apple music
 
     $apireturn["recording"]["length"] = 0;
-    $apireturn["status"] = Array ("success"=>"true", "source"=>"ext");
+    $apireturn["status"] = Array ("success"=>"true", "source"=>"ext", "country"=>($_REQUEST["country"] ? $_REQUEST["country"] : "us"));
 
-    $spot = fetchapple ($work, "tracks");
+    $spot = fetchapple ($work, "tracks", 0, 0, $_REQUEST["country"]);
 
     if (sizeof ($spot["items"]) <= 0 && FALSE)
     {
       preg_match_all (CATALOGUE_REGEX, $work[0]["title"], $matches);
       $work[0]["title"] = str_replace ($matches[0][0], "", $work[0]["title"]);
-      $spot = fetchapple ($work, "tracks");
+      $spot = fetchapple ($work, "tracks", 0, 0, $_REQUEST["country"]);
     }
 
     // guessing the performers
@@ -96,4 +96,11 @@
     }
   }
 
-  echo savecache ("/recording/detail/work/{$_REQUEST["wid"]}/album/{$_REQUEST["aid"]}/{$_REQUEST["set"]}.json", apireturn ($apireturn));
+  if ($_REQUEST["country"])
+  {
+    echo savecache ("/recording/{$_REQUEST["country"]}/detail/work/{$_REQUEST["wid"]}/album/{$_REQUEST["aid"]}/{$_REQUEST["set"]}.json", apireturn ($apireturn));
+  }
+  else 
+  {
+    echo savecache ("/recording/detail/work/{$_REQUEST["wid"]}/album/{$_REQUEST["aid"]}/{$_REQUEST["set"]}.json", apireturn ($apireturn));
+  }
