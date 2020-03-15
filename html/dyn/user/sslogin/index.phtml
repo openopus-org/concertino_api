@@ -32,7 +32,7 @@
 
       if (!stristr ($_REQUEST["recid"], "guest"))
       {
-        $query = "update user set apple_recid = '{$_REQUEST["recid"]}', lastlogin='". time(). "' where id = '{$_REQUEST["id"]}'";
+        $query = "update user set apple_recid = '{$_REQUEST["recid"]}', lastlogin='". time(). "', country = '{$_REQUEST["country"]}' where id = '{$_REQUEST["id"]}'";
         mysqli_query ($mysql, $query);
       }
       
@@ -43,8 +43,8 @@
     {
       // registering the user to the concertino db
 
-      $query = "insert into user (auth, apple_recid, lastlogin) values ('$auth', '{$_REQUEST["recid"]}', '". time(). "')
-                on duplicate key update id=id, apple_recid='{$_REQUEST["recid"]}', lastlogin=". time();
+      $query = "insert into user (auth, apple_recid, lastlogin, country) values ('$auth', '{$_REQUEST["recid"]}', '". time(). "', '{$_REQUEST["country"]}')
+                on duplicate key update id=id, apple_recid='{$_REQUEST["recid"]}', country='{$_REQUEST["country"]}', lastlogin=". time();
       mysqli_query ($mysql, $query);
       $uid = mysqli_insert_id ($mysql);
 
