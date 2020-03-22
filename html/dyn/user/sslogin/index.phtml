@@ -58,6 +58,7 @@
     // retrieving user's lists 
 
     $apireturn["works"] = worklist ($_REQUEST["id"]);
+    $apireturn["composerworks"] = workcomposerlist ($_REQUEST["id"]);
     $apireturn["favorite"] = composerlist ("favorite", $_REQUEST["id"]);
     $apireturn["forbidden"] = composerlist ("forbidden", $_REQUEST["id"]);
     $apireturn["playlists"] = playlists ($_REQUEST["id"]);
