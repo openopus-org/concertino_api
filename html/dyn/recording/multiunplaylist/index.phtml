@@ -32,7 +32,7 @@
           $recq[] = "('{$recp[0]}','{$recp[1]}','{$recp[2]}')";
         }
         
-        $query = "delete from playlist_recording where playlist_id in '{$_REQUEST["pid"]}' and (work_id, apple_albumid, subset) in (". implode (",", $recq). ")";
+        $query = "delete from playlist_recording where playlist_id = '{$_REQUEST["pid"]}' and (work_id, apple_albumid, subset) in (". implode (",", $recq). ")";
         mysqli_query ($mysql, $query);
 
         $apireturn["status"]["success"] = "true";
