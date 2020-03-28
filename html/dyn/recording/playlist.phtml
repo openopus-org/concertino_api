@@ -77,7 +77,7 @@
 
     foreach ($apirecordings as $apid => $apirec)
     {
-      $apirecordings[$apid]["performers"] = orderperformers ($apirec["performers"]);
+      $apirecordings[$apid]["performers"] = []; /*orderperformers ($apirec["performers"]);*/
     }
 
     ksort ($apirecordings);
