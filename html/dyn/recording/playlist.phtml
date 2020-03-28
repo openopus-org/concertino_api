@@ -80,6 +80,8 @@
       $apirecordings[$apid]["performers"] = []; /*orderperformers ($apirec["performers"]);*/
     }
 
+    print_r ($apirecordings);
+
     ksort ($apirecordings);
     $apireturn["recordings"] = array_values ($apirecordings);
   }
