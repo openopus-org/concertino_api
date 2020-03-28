@@ -8,7 +8,7 @@
     $apireturn["status"]["success"] = "false";
     $apireturn["status"]["error"] = "Authentication failed";
   }
-  else if (!postcheck ($_REQUEST, ["rid", "pid"]))
+  else if (!postcheck ($_REQUEST, ["pid"]))
   {
     $apireturn["status"]["success"] = "false";
     $apireturn["status"]["error"] = "Missing fields";
@@ -24,16 +24,27 @@
       {
         // removing the recordings from the playlist
 
-        $recs = explode (",", $_REQUEST["rid"]);
-
-        foreach ($recs as $rec)
+        if ($_REQUEST["rid"])
         {
-          $recp = explode ("-", $rec);
-          $recq[] = "('{$recp[0]}','{$recp[1]}','{$recp[2]}')";
+          $recs = explode (",", $_REQUEST["rid"]);
+
+          foreach ($recs as $rec)
+          {
+            $recp = explode ("-", $rec);
+            $recq[] = "('{$recp[0]}','{$recp[1]}','{$recp[2]}')";
+          }
+          
+          $query = "delete from playlist_recording where playlist_id = '{$_REQUEST["pid"]}' and (work_id, apple_albumid, subset) in (". implode (",", $recq). ")";
+          mysqli_query ($mysql, $query);
         }
         
-        $query = "delete from playlist_recording where playlist_id = '{$_REQUEST["pid"]}' and (work_id, apple_albumid, subset) in (". implode (",", $recq). ")";
-        mysqli_query ($mysql, $query);
+        // renaming the playlist
+
+        if ($_REQUEST["name"])
+        {
+          $query = "update playlist set name = '{$_REQUEST["name"]}' where id = '{$_REQUEST["pid"]}' and user_id = '{$_REQUEST["id"]}'";
+          mysqli_query ($mysql, $query);
+        }
 
         $apireturn["status"]["success"] = "true";
       }
