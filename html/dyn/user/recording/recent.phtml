@@ -59,6 +59,11 @@
     }
   }
 
+  foreach ($apireturn["recordings"] as $apid => $apirec)
+  {
+    $apireturn["recordings"][$apid]["performers"] = orderperformers ($apirec["performers"]);
+  }
+
   if (isset ($apireturn["recordings"]))
   {
     $apireturn["status"]["rows"] = sizeof ($apireturn["recordings"]);

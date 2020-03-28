@@ -60,6 +60,12 @@
     }
 
     $apirecordings = $apireturn["recordings"];
+
+    foreach ($apirecordings as $apid => $apirec)
+    {
+      $apirecordings[$apid]["performers"] = orderperformers ($apirec["performers"]);
+    }
+
     ksort ($apirecordings);
     $apireturn["recordings"] = array_values ($apirecordings);
   }
