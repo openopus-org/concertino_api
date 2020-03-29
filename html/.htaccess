@@ -58,4 +58,7 @@ RewriteRule user/(.*)/composer/(.*)/work/fav/search/(.*).json dyn/user/work/fav.
 
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule applemusic/token.json dyn/applemusic/token.phtml [L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule playlist/public/list.json dyn/playlist/list.phtml [L] 
 </IfModule>
