@@ -82,6 +82,35 @@
 
     ksort ($apirecordings);
     $apireturn["recordings"] = array_values ($apirecordings);
+
+    // checks apple music if recordings are available in the storefront
+
+    if ($_REQUEST["country"])
+    {
+      foreach ($apireturn["recordings"] as $recs)
+      {
+          $plids[] = $recs["apple_albumid"];
+      }
+
+      $albids = implode (",", $plids);
+      $chkalbs = appledownparse (APPLEMUSICAPI. "/catalog/{$_REQUEST["country"]}/albums?ids={$albids}", APPMUSTOKEN);
+
+      foreach ($chkalbs["data"] as $albchk)
+      {
+          $albschkd[] = $albchk["id"];
+      }
+
+      foreach ($apireturn["recordings"] as $recss)
+      {
+        if (in_array ($recss["apple_albumid"], $albschkd))
+        {
+          $apireturn["valid-recordings"][] = $recss;
+        }
+      }
+
+      $apireturn["recordings"] = $apireturn["valid-recordings"];
+      unset($apireturn["valid-recordings"]);
+    }
   }
 
   if (isset ($apireturn["recordings"]))
@@ -90,4 +119,11 @@
     $apireturn["works"] = $obworks["abstract"];
   }
 
-  echo savecache ("/recording/list/playlist/{$_REQUEST["id"]}.json", apireturn ($apireturn));
+  if ($_REQUEST["country"])
+  {
+    echo savecache ("/recording/{$_REQUEST["country"]}/list/playlist/{$_REQUEST["id"]}.json", apireturn ($apireturn));
+  }
+  else
+  {
+    echo savecache ("/recording/list/playlist/{$_REQUEST["id"]}.json", apireturn ($apireturn));
+  }

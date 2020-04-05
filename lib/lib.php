@@ -51,12 +51,12 @@
     {  
       foreach ($work["work"]["searchterms"] as $search)
       {
-        $tspalbums = appledownparse (APPLEMUSICAPI. "/catalog/{$country}/search?types=songs&offset={$offset}&limit=". APPLAPI_ITEMS. "&term=". trim(urlencode ($search. " {$work["composer"]["complete_name"]}")), $token);
+        $tspalbums = appledownparse (APPLEMUSICAPI. "/catalog/{$country}/search?types=songs&offset={$offset}&l=en-US&limit=". APPLAPI_ITEMS. "&term=". trim(urlencode ($search. " {$work["composer"]["complete_name"]}")), $token);
         $loop = 1;
         
         while ($tspalbums["results"]["songs"]["next"] && $loop <= ($pagelimit ? $pagelimit : APPLEAPI_PAGES))
         {
-          $morealbums = appledownparse (APPLEMUSICAPIBASE. $tspalbums["results"]["songs"]["next"]. "&limit=". APPLAPI_ITEMS, $token);
+          $morealbums = appledownparse (APPLEMUSICAPIBASE. $tspalbums["results"]["songs"]["next"]. "&l=en-US&limit=". APPLAPI_ITEMS, $token);
 
           $tspalbums["results"]["songs"]["data"] = array_merge ($tspalbums["results"]["songs"]["data"], $morealbums["results"]["songs"]["data"]);
           $tspalbums["results"]["songs"]["next"] = $morealbums["results"]["songs"]["next"];
@@ -77,8 +77,8 @@
     }
     else if ($return == "tracks")
     {
-      $spalbums = appledownparse (APPLEMUSICAPI. "/catalog/{$country}/albums/". $work["recording"]["apple_albumid"], $token);
-      
+      $spalbums = appledownparse (APPLEMUSICAPI. "/catalog/{$country}/albums/". $work["recording"]["apple_albumid"]. "?l=en-US", $token);
+
       $extras = Array 
         (
           "label" => $spalbums["data"][0]["attributes"]["recordLabel"],

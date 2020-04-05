@@ -5,6 +5,8 @@
 
     $playlists = mysqlfetch ($mysql, "select id, name, cover from playlist where public = '1' order by name asc");
 
+    // return
+
     if (!$playlists)
     {
         $apireturn["status"] = Array ("success"=>"false", "error"=>"No public playlists found");
