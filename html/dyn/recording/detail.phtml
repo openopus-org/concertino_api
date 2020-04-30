@@ -99,6 +99,7 @@
       $apireturn["recording"]["tracks"][$trid]["starting_point"] = $acctiming;
       $acctiming += $track["length"];
       $apireturn["recording"]["apple_tracks"][] = $apireturn["recording"]["tracks"][$trid]["apple_trackid"];
+      $apireturn["recording"]["previews"][] = $apireturn["recording"]["tracks"][$trid]["preview"];
     }
   }
 
