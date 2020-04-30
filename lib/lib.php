@@ -183,6 +183,7 @@
               "position" => $alb["attributes"]["trackNumber"],
               "length" => round ($alb["attributes"]["durationInMillis"] / 1000, 0, PHP_ROUND_HALF_UP),
               "apple_trackid" => $alb["id"],
+              "preview" => $alb["attributes"]["previews"][0]["url"],
               "performers" => $performers
             );
           }
