@@ -45,6 +45,15 @@
       $udb = mysqlfetch ($mysql, "select auth from user where id='$uid'");
       $apireturn["user"] = Array ("apple_recid" => $_REQUEST["recid"], "id" => $uid, "auth" => $udb[0]["auth"]);      
     }
+
+    // retrieving user's lists 
+
+    $apireturn["works"] = worklist ($apireturn["user"]["id"]);
+    $apireturn["composerworks"] = workcomposerlist ($apireturn["user"]["id"]);
+    $apireturn["favoriterecordings"] = favrecordings ($apireturn["user"]["id"]);
+    $apireturn["favorite"] = composerlist ("favorite", $apireturn["user"]["id"]);
+    $apireturn["forbidden"] = composerlist ("forbidden", $apireturn["user"]["id"]);
+    $apireturn["playlists"] = playlists ($apireturn["user"]["id"]);
   }
 
   echo apireturn ($apireturn);
