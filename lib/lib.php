@@ -43,6 +43,14 @@
       }
     }
 
+    // hoboken catalogue exception
+
+    if (stristr ($work["work"]["catalogue"], "Hob."))
+    {
+      $work["work"]["catalogue"] = str_replace ("Hob.", "Hob( |\.)*", $work["work"]["catalogue"]);
+      $work["work"]["searchterms"] = ["hob ". $work["work"]["catalogue_number"]];
+    }
+
     // searching apple music
 
     $token = APPMUSTOKEN;
@@ -54,6 +62,7 @@
         $tspalbums = appledownparse (APPLEMUSICAPI. "/catalog/{$country}/search?types=songs&offset={$offset}&l=en-US&limit=". APPLAPI_ITEMS. "&term=". trim(urlencode ($search. " {$work["composer"]["complete_name"]}")), $token);
         $loop = 1;
         
+        //print_r ($tspalbums);
         while ($tspalbums["results"]["songs"]["next"] && $loop <= ($pagelimit ? $pagelimit : APPLEAPI_PAGES))
         {
           $morealbums = appledownparse (APPLEMUSICAPIBASE. $tspalbums["results"]["songs"]["next"]. "&l=en-US&limit=". APPLAPI_ITEMS, $token);
@@ -97,10 +106,11 @@
       
       $alb["attributes"]["name"] = preg_replace ('/^(( )*( |\,|\(|\'|\"|\-|\;|\:)( )*)/i', '', $alb["attributes"]["name"], 1);
 
-      if (substr_count (str_replace ('-', '', slug($alb["attributes"]["composerName"])), str_replace ('-', '', slug($work["composer"]["name"])))) 
+      if (substr_count (str_replace ('-', '', slug($alb["attributes"]["composerName"])), str_replace ('-', '', slug(explode (",", $work["composer"]["name"])[0])))) 
       {
         if ($mode == "catalogue")
         {
+          //echo '/('. str_replace (' ', '( )*', str_replace ("/", "\/", $work["work"]["catalogue"])). ')(( |\.))*('. str_replace (' ', '( )*', $work["work"]["catalogue_number"]). '($| |\W))/i';
           preg_match_all ('/('. str_replace (' ', '( )*', str_replace ("/", "\/", $work["work"]["catalogue"])). ')(( |\.))*('. str_replace (' ', '( )*', $work["work"]["catalogue_number"]). '($| |\W))/i', $alb["attributes"]["name"], $trmatches);
 
           if (sizeof ($trmatches[0])) 
