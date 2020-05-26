@@ -88,19 +88,21 @@
     {
       $apireturn["status"] = Array ("success"=>"true", "stats"=> $spot["stats"], "country"=>($_REQUEST["country"] ? $_REQUEST["country"] : "us"));
       $apireturn = compilationdigest ($apireturn);
+
+      if ($_REQUEST["country"])
+      {
+        echo savecache ("/recording/{$_REQUEST["country"]}/list/work/{$_REQUEST["id"]}/{$_REQUEST["offset"]}.json", apireturn ($apireturn));
+      }
+      else
+      {
+        echo savecache ("/recording/list/work/{$_REQUEST["id"]}/{$_REQUEST["offset"]}.json", apireturn ($apireturn));
+      }
     }
     else
     {
       $apireturn["status"] = Array ("success"=>"false", "error"=>"No recordings found", "stats"=> $spot["stats"]);
       unset ($apireturn["recordings"]);
-    }
-  }
 
-  if ($_REQUEST["country"])
-  {
-    echo savecache ("/recording/{$_REQUEST["country"]}/list/work/{$_REQUEST["id"]}/{$_REQUEST["offset"]}.json", apireturn ($apireturn));
-  }
-  else
-  {
-    echo savecache ("/recording/list/work/{$_REQUEST["id"]}/{$_REQUEST["offset"]}.json", apireturn ($apireturn));
+      echo apireturn ($apireturn);
+    }
   }
