@@ -12,8 +12,12 @@
   {
     //// getting apple recommendation id
 
+    /* disabled by apple
     $recres = appledownparse (APPLEMUSICAPI. "/me/recommendations", APPMUSTOKEN, $_REQUEST["token"]);
     $_REQUEST["recid"] = $recres["data"][0]["id"];
+    */
+
+    $_REQUEST["recid"] = uniqid ("conc-", TRUE);
 
     //// logging in
 
