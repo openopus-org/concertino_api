@@ -8,7 +8,7 @@
 
   // fetch and analyze apple music metadata
 
-  function fetchapple ($work, $return, $offset = 0, $pagelimit = 0, $country = "us")
+  function fetchapple ($work, $return, $offset = 0, $pagelimit = 0, $country = "us", $extra = "")
   {
     global $mysql;
     
@@ -59,6 +59,7 @@
     {  
       foreach ($work["work"]["searchterms"] as $search)
       {
+        if ($extra) $search .= " ". $extra;
         $tspalbums = appledownparse (APPLEMUSICAPI. "/catalog/{$country}/search?types=songs&offset={$offset}&l=en-US&limit=". APPLAPI_ITEMS. "&term=". trim(urlencode ($search. " {$work["composer"]["complete_name"]}")), $token);
         $loop = 1;
         
@@ -256,7 +257,8 @@
       }
       else
       {
-        if ($ed["subset"] > 1 || ($ed["verified"] && !sizeof ($spot["items"][$ed["apple_albumid"]])))
+        if ($ed["subset"] > 1)
+        // || ($ed["verified"] && !sizeof ($spot["items"][$ed["apple_albumid"]])))
         {
           $spot["items"]["{$ed["apple_albumid"]}-{$ed["subset"]}"][0] = $ed;
           $spot["items"]["{$ed["apple_albumid"]}-{$ed["subset"]}"][0]["tracks"] = 2;

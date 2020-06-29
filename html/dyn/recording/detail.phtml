@@ -34,7 +34,7 @@
     $apireturn["recording"]["length"] = 0;
     $apireturn["status"] = Array ("success"=>"true", "source"=>"ext", "country"=>($_REQUEST["country"] ? $_REQUEST["country"] : "us"));
 
-    $spot = fetchapple ($work, "tracks", 0, 0, $_REQUEST["country"]);
+    $spot = fetchapple ($work, "tracks", 0, 0, $_REQUEST["country"], "");
 
     /*
     if (sizeof ($spot["items"]) <= 0)

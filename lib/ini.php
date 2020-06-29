@@ -13,7 +13,7 @@
   // global constants
 
   define ("SOFTWARENAME", "Concertino");
-  define ("SOFTWAREVERSION", "1.20");
+  define ("SOFTWAREVERSION", "1.20.6");
   define ("USERAGENT", SOFTWARENAME. "/" . SOFTWAREVERSION. " ( ". SOFTWAREMAIL. " )");
   define ("RECRETS", 60);
   define ("MIN_SIMILAR", 40);
@@ -29,6 +29,8 @@
 
   define ("APPLEMUSICAPIBASE", "https://api.music.apple.com");
   define ("APPLEMUSICAPI", APPLEMUSICAPIBASE. "/v1");
+  define ("APPLEMUSICAMPAPI", "https://amp-api.music.apple.com/v1");
+  define ("APPLEMUSICFRONTEND", "https://music.apple.com/us/browse");
 
   // open opus 
 
@@ -38,6 +40,10 @@
 
   include_once (UTILIB. "/lib.php");
   include_once (LIB. "/lib.php");
+
+  // omnisearch forbidden words
+
+  $omnisearch_forbidden = Array ("symph", "orches", "duo", "trio", "quartet", "quintet", "sextet", "septet", "octet");
 
   // api init
 

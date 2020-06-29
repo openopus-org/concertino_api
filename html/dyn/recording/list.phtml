@@ -17,15 +17,13 @@
 
     $apireturn["work"] = $work["work"];
     $apireturn["work"]["composer"] = $work["composer"];
-
-    $apireturn["status"]["source"] = "ext";
-
+    
     // searching apple music
 
     $wid = $work["work"]["id"];
     $ii = -1;
 
-    $spot = fetchapple ($work, "albums", $_REQUEST["offset"], $_REQUEST["limitpage"], $_REQUEST["country"]);
+    $spot = fetchapple ($work, "albums", $_REQUEST["offset"], $_REQUEST["limitpage"], $_REQUEST["country"], $_REQUEST["extra"]);
 
     $allperfs = [];
 
@@ -86,7 +84,9 @@
 
     if (isset ($apireturn["recordings"]))
     {
-      $apireturn["status"] = Array ("success"=>"true", "stats"=> $spot["stats"], "country"=>($_REQUEST["country"] ? $_REQUEST["country"] : "us"));
+      $apireturn["status"] = Array ("success"=>"true", "source" => "ext", "stats"=> $spot["stats"], "country"=>($_REQUEST["country"] ? $_REQUEST["country"] : "us"));
+      if ($_REQUEST["extra"]) $apireturn["status"]["extra_search"] = $_REQUEST["extra"];
+      
       $apireturn = compilationdigest ($apireturn);
 
       if ($_REQUEST["country"])
@@ -100,7 +100,8 @@
     }
     else
     {
-      $apireturn["status"] = Array ("success"=>"false", "error"=>"No recordings found", "stats"=> $spot["stats"]);
+      $apireturn["status"] = Array ("success"=>"false", "source" => "ext", "error"=>"No recordings found", "stats"=> $spot["stats"]);
+      if ($_REQUEST["extra"]) $apireturn["status"]["extra_search"] = $_REQUEST["extra"];
       unset ($apireturn["recordings"]);
 
       echo apireturn ($apireturn);
