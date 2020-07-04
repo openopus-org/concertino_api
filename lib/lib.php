@@ -126,7 +126,7 @@
 
           $rreturn[] = Array
             (
-              "apple_albumid" => $apple_albumid,
+              "apple_albumid" => (string) $apple_albumid,
               "set" => 1,
               "cover" => $albums["apple_imgurl"],
               "performers" => $track["performers"],
@@ -236,7 +236,7 @@
             "work_id" => $wid,
             "year" => $year,
             "apple_imgurl" => str_replace ("{w}x{h}", "320x320", $alb["attributes"]["artwork"]["url"]),
-            "apple_albumid" => $apple_albumid,
+            "apple_albumid" => (string) $apple_albumid,
             "performers" => $performers,
             "tracks" => (in_array ($alb["attributes"]["playParams"]["id"], $usedtracks) ? sizeof ($albums[$apple_albumid]) : sizeof ($albums[$apple_albumid])+1)
           );
