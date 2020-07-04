@@ -6,6 +6,268 @@
     return apidownparse ($url, "json", $token, $usertoken);
   }
 
+  // searching freely on apple music 
+
+  function searchapple ($search, $offset = 0, $country = "us")
+  {
+    // enforce default country
+
+    if (!$country)
+    {
+      $country = "us";
+    }
+
+    // fetching apple music api
+
+    $amres = appledownparse (APPLEMUSICAPI. "/catalog/{$country}/search?types=songs&offset={$offset}&l=en-US&limit=". APPLAPI_ITEMS. "&term=". trim(urlencode ($search)), APPMUSTOKEN);
+    $loop = 1;
+
+    while ($amres["results"]["songs"]["next"] && $loop <= APPLEAPI_PAGES)
+    {
+      $amresmore = appledownparse (APPLEMUSICAPIBASE. $amres["results"]["songs"]["next"]. "&l=en-US&limit=". APPLAPI_ITEMS, APPMUSTOKEN);
+
+      $amres["results"]["songs"]["data"] = array_merge ($amres["results"]["songs"]["data"], $amresmore["results"]["songs"]["data"]);
+      $amres["results"]["songs"]["next"] = $amresmore["results"]["songs"]["next"];
+      $loop++;
+    }
+
+    // grouping by album id, composer name and work title
+
+    foreach ($amres["results"]["songs"]["data"] as $alb)
+    {
+      unset ($performers);
+
+      if (in_array ("Classical", $alb["attributes"]["genreNames"]) || in_array ("Opera", $alb["attributes"]["genreNames"]))
+      {
+        $alb["artists"] = preg_split("/(\,|\&)/", $alb["attributes"]["artistName"]);
+
+        foreach ($alb["artists"] as $kart => $art)
+        {
+          if (!strpos ($art["name"], "/"))
+          {
+            $performers[] = trim ($art);
+          }
+        }
+
+        if (sizeof ($performers))
+        {
+          $apple_albumid = explode ("?", end (explode ("/", $alb["attributes"]["url"])))[0];
+
+          if (!isset ($return[$apple_albumid]))
+          {
+            $return[$apple_albumid] = Array 
+            (
+              "id" => $apple_albumid,
+              "year" => $alb["attributes"]["releaseDate"],
+              "apple_imgurl" => str_replace ("{w}x{h}", "320x320", $alb["attributes"]["artwork"]["url"]),
+            );
+          }
+
+          unset ($subtitle);
+
+          if (isset ($alb["attributes"]["workName"]))
+          {
+            $work_title = $alb["attributes"]["workName"];
+          }
+          else
+          {
+            $work_title = explode(":", $alb["attributes"]["name"])[0];
+          }
+
+          preg_match ('/(\(.*?\))/i', $alb["attributes"]["name"], $matches);
+  
+          if (sizeof ($matches) > 0)
+          {
+            $subtitle = $matches[sizeof ($matches)-1];
+            $work_title = str_replace ($subtitle, "", $work_title);
+            $subtitle = preg_replace ('/\(|\)/', '', $subtitle);
+          }
+
+          $work_title = trim ($work_title);
+
+          $compworks[str_replace ("-", "", slug ($alb["attributes"]["composerName"])). str_replace ("-", "", slug (worksimplifier ($work_title)))] = ["composer" => $alb["attributes"]["composerName"], "title" => $work_title];
+
+          $return[$apple_albumid]["tracks"][str_replace ("-", "", slug ($alb["attributes"]["composerName"]))][str_replace ("-", "", slug (worksimplifier ($work_title)))] = Array 
+            (
+              "id" => $alb["attributes"]["playParams"]["id"],
+              "full_title" => $alb["attributes"]["name"],
+              "title" => $work_title,
+              "subtitle" => $subtitle,
+              "composer" => $alb["attributes"]["composerName"],
+              "performers" => $performers,
+            );
+        }
+      }
+    }
+
+    // guessing composer and works
+
+    $guessedworks = openopusdownparse ("dyn/work/guess/", ["works"=>json_encode (array_values ($compworks))]);
+
+    foreach ($guessedworks["works"] as $gwork)
+    {
+      $worksdb[str_replace ("-", "", slug ($gwork["requested"]["composer"])). "-". str_replace ("-", "", slug (worksimplifier ($gwork["requested"]["title"])))] = $gwork["guessed"];
+    }
+
+    foreach ($return as $apple_albumid => $albums)
+    {
+      foreach ($albums["tracks"] as $comp => $wks)
+      {
+        foreach ($wks as $wk => $track)
+        {
+          if (isset ($worksdb[$comp. "-". $wk]))
+          {
+            $rwork = $worksdb[$comp. "-". $wk];
+          }
+          else 
+          {
+            $rwork = ["id" => "at*{$track["id"]}", "title" => $track["title"], "composer" => ["complete_name" => $track["composer"]]];
+          }
+
+          $rreturn[] = Array
+            (
+              "apple_albumid" => $apple_albumid,
+              "set" => 1,
+              "cover" => $albums["apple_imgurl"],
+              "performers" => $track["performers"],
+              "work" => $rwork
+            );
+        }
+      }
+    }
+    
+    return $rreturn;
+  }
+
+  // fetch a recording using only apple music data
+
+  function detailapple ($apple_albumid, $trackid, $country = "us")
+  {
+    if (!$country)
+    {
+      $country = "us";
+    }
+
+    $spalbums = appledownparse (APPLEMUSICAPI. "/catalog/{$country}/albums/{$apple_albumid}?l=en-US", APPMUSTOKEN);
+    
+    $extras = Array 
+      (
+        "label" => $spalbums["data"][0]["attributes"]["recordLabel"],
+        "cover" => str_replace ("{w}x{h}", "320x320", $spalbums["data"][0]["attributes"]["artwork"]["url"]),
+        "year" => $spalbums["data"][0]["attributes"]["releaseDate"]
+      );
+
+    $data = $spalbums["data"][0]["relationships"]["tracks"]["data"];
+
+    foreach ($data as $alb)
+    {
+      if ($alb["id"] == $trackid)
+      {
+        $extras["composer"]["complete_name"] = $alb["attributes"]["composerName"];
+        
+        if (isset ($alb["attributes"]["workName"]))
+        {
+          $work_title = $alb["attributes"]["workName"];
+        }
+        else
+        {
+          $work_title = explode(":", $alb["attributes"]["name"])[0];
+        }
+
+        preg_match ('/(\(.*?\))/i', $alb["attributes"]["name"], $matches);
+
+        if (sizeof ($matches) > 0)
+        {
+          $subtitle = $matches[sizeof ($matches)-1];
+          $work_title = str_replace ($subtitle, "", $work_title);
+          $subtitle = preg_replace ('/\(|\)/', '', $subtitle);
+        }
+
+        $extras["work"]["title"] = trim ($work_title);
+        $extras["work"]["subtitle"] = trim ($subtitle);
+      }
+    }
+
+    foreach ($data as $kalb => $alb)
+    {
+      unset ($performers);
+
+      if (isset ($alb["attributes"]["workName"]))
+      {
+        $work_title = $alb["attributes"]["workName"];
+      }
+      else
+      {
+        $work_title = explode(":", $alb["attributes"]["name"])[0];
+      }
+
+      preg_match ('/(\(.*?\))/i', $alb["attributes"]["name"], $matches);
+
+      if (sizeof ($matches) > 0)
+      {
+        $subtitle = $matches[sizeof ($matches)-1];
+        $work_title = trim (str_replace ($subtitle, "", $work_title));
+      }
+
+      if ($work_title == $extras["work"]["title"])
+      {
+        $alb["artists"] = preg_split("/(\,|\&)/", $alb["attributes"]["artistName"]);
+        foreach ($alb["artists"] as $kart => $art)
+        {
+          if (!strpos ($art["name"], "/"))
+          {
+            $performers[] = trim ($art);
+          }
+        }
+
+        if (sizeof ($performers))
+        {
+          $year = $alb["attributes"]["releaseDate"];
+          
+          $apple_albumid = explode ("?", end (explode ("/", $alb["attributes"]["url"])))[0];
+          
+          $albums[$apple_albumid][] = Array 
+          (
+            "similarity_between" => Array ($work["work"]["searchtitle"], worksimplifier (explode (":", $alb["attributes"]["name"])[0])),
+            "mostsimilar" => $similarity,
+            "full_title" => $alb["attributes"]["name"],
+            "title" => trim (end (explode (":", $alb["attributes"]["name"]))),
+            "similarity" => $similarity,
+            "work_id" => $wid,
+            "year" => $year,
+            "apple_imgurl" => str_replace ("{w}x{h}", "320x320", $alb["attributes"]["artwork"]["url"]),
+            "apple_albumid" => $apple_albumid,
+            "performers" => $performers,
+            "tracks" => (in_array ($alb["attributes"]["playParams"]["id"], $usedtracks) ? sizeof ($albums[$apple_albumid]) : sizeof ($albums[$apple_albumid])+1)
+          );
+          
+          $usedtracks[] = $alb["attributes"]["playParams"]["id"];
+
+          $tracks[] = Array 
+          (
+            "full_title" => $alb["attributes"]["name"],
+            "title" => trim (str_replace ("(Live)", "", end (explode (":", end (explode ("/", $alb["attributes"]["name"])))))),
+            "cd" => $alb["attributes"]["discNumber"],
+            "position" => $alb["attributes"]["trackNumber"],
+            "length" => round ($alb["attributes"]["durationInMillis"] / 1000, 0, PHP_ROUND_HALF_UP),
+            "apple_trackid" => $alb["id"],
+            "preview" => $alb["attributes"]["previews"][0]["url"],
+            "performers" => $performers
+          );
+        }
+      } 
+    }
+
+    $stats = Array 
+      (
+        "apple_responses" => count ($data),
+        "useful_responses" => count ($tracks),
+        "usefulness_rate" => round(100*(count ($tracks)/count ($data)), 2). "%"
+      );
+
+    return Array ("type"=> "tracks", "items"=>$tracks, "stats"=>$stats, "extras"=>$extras);
+  }
+
   // fetch and analyze apple music metadata
 
   function fetchapple ($work, $return, $offset = 0, $pagelimit = 0, $country = "us", $extra = "")

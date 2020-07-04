@@ -1,0 +1,59 @@
+<?
+  include_once ("../../../lib/inc.php");
+  
+  $apireturn["request"]["type"] = "freesearch";
+  $apireturn["request"]["search"] = $_REQUEST["search"];
+  $apireturn["request"]["offset"] = $_REQUEST["offset"];
+
+  if ($_REQUEST["search"])
+  {
+    $appleres = searchapple ($_REQUEST["search"], $_REQUEST["offset"], $_REQUEST["country"]);
+    
+    $allperfs = [];
+
+    foreach ($appleres as $alb)
+    {
+      $allperfs = array_merge ($allperfs, $alb["performers"]);
+    }
+
+    // guessing the performers
+
+    $perfs = openopusdownparse ("dyn/performer/list/", ["names"=>json_encode ($allperfs)]);
+    $rldb = $perfs["performers"]["digest"];
+
+    // adding the performers to the recording items
+
+    foreach ($appleres as $k => $alb)
+    {
+      $appleres[$k]["performers"] = allperformers ($alb["performers"], $rldb, $alb["work"]["composer"]["complete_name"]);
+    }
+
+    $apireturn["recordings"] = $appleres;
+    
+    if (sizeof ($recordings) == 100)
+    {
+        $apireturn["next"] = $_REQUEST["offset"] + 100;
+    }
+  }
+
+  if (isset ($apireturn["recordings"]))
+  {
+    $apireturn["status"] = Array ("success"=>"true", "source" => "ext", "rows"=>sizeof ($apireturn["recordings"]), "country"=>($_REQUEST["country"] ? $_REQUEST["country"] : "us"));
+      
+    if ($_REQUEST["country"])
+    {
+      echo savecache ("/freesearch/{$_REQUEST["country"]}/{$_REQUEST["search"]}/{$_REQUEST["offset"]}.json", apireturn ($apireturn));
+    }
+    else
+    {
+      echo savecache ("/freesearch/{$_REQUEST["search"]}/{$_REQUEST["offset"]}.json", apireturn ($apireturn));
+    }
+  }
+  else
+  {
+    $apireturn["status"] = Array ("success"=>"false", "source" => "ext", "error"=>"No recordings found");
+    unset ($apireturn["recordings"]);
+
+    echo apireturn ($apireturn);
+  }
+  

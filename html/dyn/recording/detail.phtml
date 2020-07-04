@@ -2,52 +2,70 @@
   include_once ("../../../lib/inc.php");
   global $timesteps;
 
-  // try to find the work
+  $goquery = true;
 
-  $work = openopusdownparse ("work/detail/{$_REQUEST["wid"]}.json");
-  
-  if (!$work)
+  if (stristr ($_REQUEST["wid"], "at*"))
   {
-    // if work doesn't exist, return an error
+    // apple music work
 
-    $apireturn["status"] = Array ("success"=>"false", "error"=>"Work not found");
-  }
-  else
-  {
-    // work exists
+    $goquery = true;
+    $work_appletid = str_replace ("at*", "", $_REQUEST["wid"]);
+    $apireturn["status"] = Array ("success"=>"true", "source"=>"ext", "country"=>($_REQUEST["country"] ? $_REQUEST["country"] : "us"));
 
-    $work["recording"]["apple_albumid"] = $_REQUEST["aid"];
+    $spot = detailapple ($_REQUEST["aid"], $work_appletid, $_REQUEST["country"]);
 
-    $apireturn["work"] = $work["work"];
-    $apireturn["work"]["composer"] = $work["composer"];
+    $apireturn["work"] = $spot["extras"]["work"];
+    $apireturn["work"]["composer"] = $spot["extras"]["composer"];
     
     $apireturn["recording"] = Array
       (
-         "apple_albumid"=>$_REQUEST["aid"],
-         "apple_tracks"=>Array (),
-         "performers"=>Array (),
-         "tracks"=>Array (),
+        "apple_albumid"=>$_REQUEST["aid"],
+        "apple_tracks"=>Array (),
+        "performers"=>Array (),
+        "tracks"=>Array (),
       );
+  }
+  else
+  {
+    // open opus work
 
-    // fetching data from apple music
-
-    $apireturn["recording"]["length"] = 0;
-    $apireturn["status"] = Array ("success"=>"true", "source"=>"ext", "country"=>($_REQUEST["country"] ? $_REQUEST["country"] : "us"));
-
-    $spot = fetchapple ($work, "tracks", 0, 0, $_REQUEST["country"], "");
-
-    /*
-    if (sizeof ($spot["items"]) <= 0)
+    $work = openopusdownparse ("work/detail/{$_REQUEST["wid"]}.json");
+  
+    if (!$work)
     {
-      preg_match_all (CATALOGUE_REGEX, $work[0]["title"], $matches);
-      $work[0]["title"] = str_replace ($matches[0][0], "", $work[0]["title"]);
+      // if work doesn't exist, return an error
 
-      // no recording found, trying the default storefront
-
-      //$spot = fetchapple ($work, "tracks");
+      $apireturn["status"] = Array ("success"=>"false", "error"=>"Work not found");
+      $goquery = false;
     }
-    */
+    else
+    {
+      // work exists
 
+      $work["recording"]["apple_albumid"] = $_REQUEST["aid"];
+
+      $apireturn["work"] = $work["work"];
+      $apireturn["work"]["composer"] = $work["composer"];
+      
+      $apireturn["recording"] = Array
+        (
+          "apple_albumid"=>$_REQUEST["aid"],
+          "apple_tracks"=>Array (),
+          "performers"=>Array (),
+          "tracks"=>Array (),
+        );
+
+      // fetching data from apple music
+
+      $apireturn["recording"]["length"] = 0;
+      $apireturn["status"] = Array ("success"=>"true", "source"=>"ext", "country"=>($_REQUEST["country"] ? $_REQUEST["country"] : "us"));
+
+      $spot = fetchapple ($work, "tracks", 0, 0, $_REQUEST["country"], "");
+    }
+  }
+
+  if ($goquery)
+  {
     // guessing the performers
 
     $perfs = openopusdownparse ("dyn/performer/list/", ["names"=>json_encode (end($spot["items"])["performers"])]);

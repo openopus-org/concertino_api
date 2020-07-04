@@ -79,4 +79,11 @@ RewriteRule omnisearch/(.*)/(.*)/(.*).json dyn/omnisearch/list.phtml?country=$1&
 
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule omnisearch/(.*)/(.*).json dyn/omnisearch/list.phtml?search=$1&offset=$2 [L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule freesearch/(.*)/(.*)/(.*).json dyn/freesearch/list.phtml?country=$1&search=$2&offset=$3 [L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule freesearch/(.*)/(.*).json dyn/freesearch/list.phtml?search=$1&offset=$2 [L]
+
 </IfModule>
