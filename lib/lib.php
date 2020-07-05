@@ -121,7 +121,7 @@
           }
           else 
           {
-            $rwork = ["id" => "at*{$track["id"]}", "title" => $track["title"], "composer" => ["complete_name" => $track["composer"]]];
+            $rwork = ["id" => "at*{$track["id"]}", "title" => $track["title"], "composer" => ["complete_name" => $track["composer"]], "genre"=>"None"];
           }
 
           $rreturn[] = Array
