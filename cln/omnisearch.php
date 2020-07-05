@@ -2,8 +2,6 @@
   chdir ($_SERVER["CTINHTMLDIR"]);
   include_once ("../lib/inc.php");
 
-  $omnisearch_forbidden = Array ("symph", "sinfonietta", "orques", "orches", "duo", "trio", "quartet", "quintet", "sextet", "septet", "octet");
-
   $forbidden = implode ("(.*)|", $omnisearch_forbidden);
   $forbidden_regexp = '\\\b('. $forbidden. '(.*))\\\b';
 
