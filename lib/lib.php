@@ -128,6 +128,7 @@
             (
               "apple_albumid" => (string) $apple_albumid,
               "set" => 1,
+              "verified" => "false",
               "cover" => $albums["apple_imgurl"],
               "performers" => $track["performers"],
               "work" => $rwork
