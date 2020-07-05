@@ -37,7 +37,7 @@
     {
       unset ($performers);
 
-      if ($alb["attributes"]["composerName"] && in_array ("Classical", $alb["attributes"]["genreNames"]) || in_array ("Opera", $alb["attributes"]["genreNames"]))
+      if (trim ($alb["attributes"]["composerName"]) != "" && (in_array ("Classical", $alb["attributes"]["genreNames"]) || in_array ("Opera", $alb["attributes"]["genreNames"])))
       {
         $alb["artists"] = preg_split("/(\,|\&)/", $alb["attributes"]["artistName"]);
 
