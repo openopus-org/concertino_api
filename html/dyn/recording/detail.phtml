@@ -61,6 +61,16 @@
       $apireturn["status"] = Array ("success"=>"true", "source"=>"ext", "country"=>($_REQUEST["country"] ? $_REQUEST["country"] : "us"));
 
       $spot = fetchapple ($work, "tracks", 0, 0, $_REQUEST["country"], "");
+
+      // dealing with empty albums
+
+      if (!sizeof ($spot["items"]) && $work["work"]["searchmode"] == "catalogue")
+      {
+        $work["work"]["searchmode"] = "title";
+        $work["work"]["searchterms"] = [worksimplifier ($work["work"]["title"])];
+
+        $spot = fetchapple ($work, "tracks", 0, 0, $_REQUEST["country"], "");
+      }
     }
   }
 
