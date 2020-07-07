@@ -43,7 +43,7 @@
 
   // omnisearch forbidden words
 
-  $omnisearch_forbidden = Array ("symph", "sinfonietta", "orques", "orches", "duo", "trio", "quartet", "quintet", "sextet", "septet", "octet");
+  $omnisearch_forbidden = Array ("symphony", "sinfonietta", "orquesta", "orchestra", "symphonic", "philharmonic", "duo", "trio", "quartet", "quintet", "sextet", "septet", "octet");
 
   // api init
 

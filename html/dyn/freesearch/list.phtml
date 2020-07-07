@@ -7,14 +7,46 @@
 
   if ($_REQUEST["search"])
   {
-    $appleres = searchapple ($_REQUEST["search"], $_REQUEST["offset"], $_REQUEST["country"]);
+    // fetching and analyzing apple music results
+
+    $applefirstres = searchapple ($_REQUEST["search"], $_REQUEST["offset"], $_REQUEST["country"]);
     
+    // filtering out the results
+
+    $forbidden = implode ("|", $omnisearch_forbidden);
+    $forbidden_regexp = '/\b('. $forbidden. ')\b/i';
+
+    $top_appleres = [];
+    $mid_appleres = [];
+    $bottom_appleres = [];
     $allperfs = [];
 
-    foreach ($appleres as $alb)
+    foreach ($applefirstres as $alb)
     {
-      $allperfs = array_merge ($allperfs, $alb["performers"]);
+      $composersummary = $alb["work"]["composer"]["complete_name"];
+      $worksummary = $composersummary. " ". $alb["work"]["title"];
+      $recordingsummary = $worksummary. " ". preg_replace ($forbidden_regexp, "", implode (" ", $alb["performers"]));
+
+      if (in_string ($_REQUEST["search"], $recordingsummary))
+      {
+        if (in_string ($_REQUEST["search"], $composersummary))
+        {
+          $top_appleres[] = $alb;
+        }
+        else if (in_string ($_REQUEST["search"], $worksummary))
+        {
+          $mid_appleres[] = $alb;
+        }
+        else
+        {
+          $bottom_appleres[] = $alb;
+        }
+
+        $allperfs = array_merge ($allperfs, $alb["performers"]);
+      }
     }
+
+    $appleres = array_merge ($top_appleres, $mid_appleres, $bottom_appleres);
 
     // guessing the performers
 
@@ -30,7 +62,7 @@
 
     $apireturn["recordings"] = $appleres;
     
-    if (sizeof ($recordings) == 100)
+    if (sizeof ($applefirstres) == 100)
     {
         $apireturn["next"] = $_REQUEST["offset"] + 100;
     }
