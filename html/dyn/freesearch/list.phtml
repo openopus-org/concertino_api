@@ -9,8 +9,9 @@
   {
     // fetching and analyzing apple music results
 
-    $applefirstres = searchapple ($_REQUEST["search"], $_REQUEST["offset"], $_REQUEST["country"]);
-    
+    $apple = searchapple ($_REQUEST["search"], $_REQUEST["offset"], $_REQUEST["country"]);
+    $applefirstres = $apple["recordings"];
+
     // filtering out the results
 
     $forbidden = implode ("|", $omnisearch_forbidden);
@@ -62,7 +63,7 @@
 
     $apireturn["recordings"] = $appleres;
     
-    if (sizeof ($applefirstres) == 100)
+    if ($apple["next"] == "true")
     {
         $apireturn["next"] = $_REQUEST["offset"] + 100;
     }
@@ -70,8 +71,16 @@
 
   if (isset ($apireturn["recordings"]))
   {
-    $apireturn["status"] = Array ("success"=>"true", "source" => "ext", "rows"=>sizeof ($apireturn["recordings"]), "country"=>($_REQUEST["country"] ? $_REQUEST["country"] : "us"));
-      
+    $apireturn["status"] = Array ("success"=>"true", "source" => "ext", "rows"=>sizeof ($apireturn["recordings"]), "country"=>($_REQUEST["country"] ? $_REQUEST["country"] : "us"));  
+    $apireturn["status"]["stats"] = Array 
+    (
+      "apple_responses" => count ($applefirstres),
+      "useful_responses" => $apireturn["status"]["rows"],
+      "usefulness_rate" => round(100*($apireturn["status"]["rows"]/count ($applefirstres)), 2). "%"
+    );
+
+    $apireturn = compilationdigest ($apireturn, true);
+
     if ($_REQUEST["country"])
     {
       echo savecache ("/freesearch/{$_REQUEST["country"]}/{$_REQUEST["search"]}/{$_REQUEST["offset"]}.json", apireturn ($apireturn));

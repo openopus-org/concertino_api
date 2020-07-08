@@ -45,6 +45,10 @@
 
   $omnisearch_forbidden = Array ("symphony", "sinfonietta", "orquesta", "orchestra", "symphonic", "philharmonic", "duo", "trio", "quartet", "quintet", "sextet", "septet", "octet");
 
+  // likely trashy compilation albums
+
+  define ("COMPILATION_TERMS", "clas sleep rela babies kids mind lounge essen best dream");
+
   // api init
 
   $starttime = microtime (true);

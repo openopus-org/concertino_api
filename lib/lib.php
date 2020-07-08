@@ -60,6 +60,7 @@
               "id" => $apple_albumid,
               "year" => $alb["attributes"]["releaseDate"],
               "apple_imgurl" => str_replace ("{w}x{h}", "320x320", $alb["attributes"]["artwork"]["url"]),
+              "album_name" => $alb["attributes"]["albumName"]
             );
           }
 
@@ -87,6 +88,8 @@
 
           $compworks[str_replace ("-", "", slug ($alb["attributes"]["composerName"])). str_replace ("-", "", slug (worksimplifier ($work_title)))] = ["composer" => $alb["attributes"]["composerName"], "title" => $work_title];
 
+          $singletrack = (isset ($return[$apple_albumid]["tracks"][str_replace ("-", "", slug ($alb["attributes"]["composerName"]))][str_replace ("-", "", slug (worksimplifier ($work_title)))]) ? "false" : "true");
+
           $return[$apple_albumid]["tracks"][str_replace ("-", "", slug ($alb["attributes"]["composerName"]))][str_replace ("-", "", slug (worksimplifier ($work_title)))] = Array 
             (
               "id" => $alb["attributes"]["playParams"]["id"],
@@ -95,6 +98,7 @@
               "subtitle" => $subtitle,
               "composer" => $alb["attributes"]["composerName"],
               "performers" => $performers,
+              "singletrack" => $singletrack
             );
         }
       }
@@ -132,13 +136,16 @@
               "verified" => "false",
               "cover" => $albums["apple_imgurl"],
               "performers" => $track["performers"],
-              "work" => $rwork
+              "work" => $rwork,
+              "album_name" => $albums["album_name"],
+              "compilation" => "false",
+              "singletrack" => $track["singletrack"]
             );
         }
       }
     }
     
-    return $rreturn;
+    return ["recordings" => $rreturn, "next" => (isset ($amres["results"]["songs"]["next"]) ? "true" : "false")];
   }
 
   // fetch a recording using only apple music data
