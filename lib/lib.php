@@ -49,7 +49,7 @@
           }
         }
 
-        if (sizeof ($performers))
+        if (sizeof ($performers) && $alb["attributes"]["discNumber"])
         {
           $apple_albumid = explode ("?", end (explode ("/", $alb["attributes"]["url"])))[0];
 
@@ -229,7 +229,7 @@
           }
         }
 
-        if (sizeof ($performers))
+        if (sizeof ($performers) && $alb["attributes"]["discNumber"])
         {
           $year = $alb["attributes"]["releaseDate"];
           
@@ -435,7 +435,7 @@
             }
           }
 
-          if (sizeof ($performers))
+          if (sizeof ($performers) && $alb["attributes"]["discNumber"])
           {
             $year = $alb["attributes"]["releaseDate"];
             
