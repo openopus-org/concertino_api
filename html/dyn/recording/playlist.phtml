@@ -3,7 +3,7 @@
 
   // try to find the recording
 
-  $recordings = mysqlfetch ($mysql, "select concat(recording.work_id,'-',recording.apple_albumid,'-',recording.subset) as id, recording.observation as observation, recording.subset, recording.verified, recording.apple_albumid, recording.work_id as work, apple_imgurl as cover, performer, role from recording, recording_performer, playlist_recording where playlist_id = '{$_REQUEST["id"]}' and recording_performer.work_id = recording.work_id and recording_performer.subset = recording.subset and recording_performer.apple_albumid = recording.apple_albumid and playlist_recording.work_id = recording.work_id and playlist_recording.subset = recording.subset and playlist_recording.apple_albumid = recording.apple_albumid order by position desc, work asc, recording.apple_albumid asc, recording.subset asc");
+  $recordings = mysqlfetch ($mysql, "select concat(recording.work_id,'-',recording.apple_albumid,'-',recording.subset) as id, recording.observation as observation, recording.subset, recording.verified, recording.apple_albumid, recording.work_id as work, recording.composer_name as composer_name, recording.work_title as work_title, apple_imgurl as cover, performer, role from recording, recording_performer, playlist_recording where playlist_id = '{$_REQUEST["id"]}' and recording_performer.work_id = recording.work_id and recording_performer.subset = recording.subset and recording_performer.apple_albumid = recording.apple_albumid and playlist_recording.work_id = recording.work_id and playlist_recording.subset = recording.subset and playlist_recording.apple_albumid = recording.apple_albumid order by position desc, work asc, recording.apple_albumid asc, recording.subset asc");
 
   if (!$recordings)
   {
@@ -33,11 +33,17 @@
 
     foreach ($recordings as $rec)
     {
-      $worklist[] = $rec["work"];
+      if (!$rec["composer_name"])
+      {
+        $worklist[] = $rec["work"];
+      }
     }
 
-    $obworks = openopusdownparse ("work/list/{$_REQUEST["cid"]}/ids/". implode (",", array_unique ($worklist)). ".json");
-
+    if (sizeof ($worklist))
+    {
+      $obworks = openopusdownparse ("work/list/{$_REQUEST["cid"]}/ids/". implode (",", array_unique ($worklist)). ".json");
+    }
+    
     foreach ($recordings as $rec)
     {
       if ($lastid != $rec["id"])
@@ -60,14 +66,14 @@
         (
           "composer"=>Array
             (
-              "id"=>$obworks["works"]["w:". $rec["work"]]["composer"]["id"],
-              "name"=>$obworks["works"]["w:". $rec["work"]]["composer"]["name"],
-              "complete_name"=>$obworks["works"]["w:". $rec["work"]]["composer"]["complete_name"],
-              "epoch"=>$obworks["works"]["w:". $rec["work"]]["composer"]["epoch"]
+              "id"=>($rec["composer_name"] ? "0" : $obworks["works"]["w:". $rec["work"]]["composer"]["id"]),
+              "name"=>($rec["composer_name"] ? $rec["composer_name"] : $obworks["works"]["w:". $rec["work"]]["composer"]["name"]),
+              "complete_name"=>($rec["composer_name"] ? $rec["composer_name"] : $obworks["works"]["w:". $rec["work"]]["composer"]["complete_name"]),
+              "epoch"=>($rec["composer_name"] ? "None" : $obworks["works"]["w:". $rec["work"]]["composer"]["epoch"])
             ),
            "id"=>$rec["work"],
-           "title"=>$obworks["works"]["w:". $rec["work"]]["title"],
-           "genre"=>$obworks["works"]["w:". $rec["work"]]["genre"],
+           "title"=>($rec["work_title"] ? $rec["work_title"] : $obworks["works"]["w:". $rec["work"]]["title"]),
+           "genre"=>($rec["work_title"] ? "None" : $obworks["works"]["w:". $rec["work"]]["genre"]),
         );
 
       $lastid = $rec["id"];
@@ -117,6 +123,22 @@
   {
     $apireturn["status"]["rows"] = sizeof ($apireturn["recordings"]);
     $apireturn["works"] = $obworks["abstract"];
+
+    foreach ($recordings as $rec)
+    {
+      if ($rec["composer_name"])
+      {
+        $cn = end (explode (" ", $rec["composer_name"]));
+        if (!in_array ($cn, $apireturn["works"]["composers"]["names"]))
+        {
+          $apireturn["works"]["composers"]["portraits"][] = OPENOPUS_DEFCOMP;
+          $apireturn["works"]["composers"]["names"][] = $cn;
+          $apireturn["works"]["works"]["rows"] += 1;
+        }
+      }
+    }
+
+    $apireturn["works"]["composers"]["rows"] = sizeof ($apireturn["works"]["composers"]["names"]);
   }
 
   if ($_REQUEST["country"])

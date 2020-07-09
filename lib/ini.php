@@ -35,6 +35,7 @@
   // open opus 
 
   define ("OPENOPUS", "http://api.openopus.org");
+  define ("OPENOPUS_DEFCOMP", "https://assets.openopus.org/portraits/default.jpg");
 
   // helper libraries
 
