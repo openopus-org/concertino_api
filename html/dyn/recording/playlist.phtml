@@ -49,7 +49,16 @@
       if ($lastid != $rec["id"])
       {
         $id = $id + 1;
-        $vid = slug ($obworks["works"]["w:". $rec["work"]]["composer"]["name"]. "-". $obworks["works"]["w:". $rec["work"]]["title"]. "-". $id);
+
+        if ($rec["composer_name"])
+        {
+          $vid = slug ($rec["composer_name"]. "-". $rec["work_title"]. "-". $id);
+        }
+        else
+        {
+          $vid = slug ($obworks["works"]["w:". $rec["work"]]["composer"]["name"]. "-". $obworks["works"]["w:". $rec["work"]]["title"]. "-". $id);
+        }
+        
         $apireturn["recordings"][$vid] = Array
           (
             "apple_albumid" => $rec["apple_albumid"],
