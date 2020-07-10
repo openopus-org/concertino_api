@@ -48,7 +48,7 @@
 
   // likely trashy compilation albums
 
-  define ("COMPILATION_TERMS", "clas clás klas clàs sleep rela babies kids mind lounge essen best dream guys rieu volo 2cellos divo");
+  define ("COMPILATION_TERMS", "clas clás klas clàs sleep rela babies kids mind lounge essen best dream guys rieu volo 2cellos divo power glory");
 
   // api init
 
