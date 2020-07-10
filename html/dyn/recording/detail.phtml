@@ -14,8 +14,7 @@
 
     $spot = detailapple ($_REQUEST["aid"], $work_appletid, $_REQUEST["country"]);
 
-    $apireturn["work"] = ["id" => $_REQUEST["wid"], "title" => $spot["extras"]["work"]["title"], "subtitle" => $spot["extras"]["work"]["subtitle"], "composer" => ["complete_name" => $spot["extras"]["composer"]["complete_name"], "id" => "0", "name" => $spot["extras"]["composer"]["complete_name"], 
-          "epoch" => "None"], "genre"=>"None"];
+    $apireturn["work"] = ["id" => $_REQUEST["wid"], "title" => $spot["extras"]["work"]["title"], "subtitle" => $spot["extras"]["work"]["subtitle"], "composer" => $spot["extras"]["composer"], "genre"=>"None"];
     
     $apireturn["recording"] = Array
       (

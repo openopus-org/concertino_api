@@ -113,6 +113,11 @@
       $worksdb[str_replace ("-", "", slug ($gwork["requested"]["composer"])). "-". str_replace ("-", "", slug (worksimplifier ($gwork["requested"]["title"])))] = $gwork["guessed"];
     }
 
+    foreach ($guessedworks["composers"] as $gcmp)
+    {
+      $compsdb[str_replace ("-", "", slug ($gcmp["requested"]))] = $gcmp["guessed"];
+    }
+
     foreach ($return as $apple_albumid => $albums)
     {
       foreach ($albums["tracks"] as $comp => $wks)
@@ -125,8 +130,23 @@
           }
           else 
           {
-            $rwork = ["id" => "at*{$track["id"]}", "title" => $track["title"], "composer" => ["complete_name" => $track["composer"], "id" => "0", "name" => $track["composer"], 
-          "epoch" => "None"], "genre"=>"None"];
+            $rwork = [
+              "id" => "at*{$track["id"]}", 
+              "title" => $track["title"], 
+              "genre"=>"None"];
+
+            if (isset ($compsdb[str_replace ("-", "", slug ($track["composer"]))]))
+            {
+              $rwork["composer"] = $compsdb[str_replace ("-", "", slug ($track["composer"]))];
+            }
+            else
+            {
+              $rwork["composer"] = [
+                "complete_name" => $track["composer"],
+                "id" => "0",
+                "name" => $track["composer"],
+                "epoch" => "None"]; 
+            }
           }
 
           $rreturn[] = Array
@@ -195,6 +215,25 @@
         $extras["work"]["title"] = trim ($work_title);
         $extras["work"]["subtitle"] = trim ($subtitle);
       }
+    }
+
+    // guessing composer and works
+
+    $guessedworks = openopusdownparse ("dyn/work/guess/", ["works"=>"[". json_encode (["composer" => $extras["composer"]["complete_name"], "title" => $extras["work"]["title"]]). "]"]);
+
+    if (isset ($guessedworks["composers"]))
+    {
+      $extras["composer"] = $guessedworks["composers"][0]["guessed"];
+    }
+    else
+    {
+      $extras["composer"] =
+        [
+          "id" => "0",
+          "name" => $extras["composer"]["complete_name"],
+          "complete_name" => $extras["composer"]["complete_name"],
+          "epoch" => "None"
+        ];
     }
 
     foreach ($data as $kalb => $alb)
