@@ -31,9 +31,16 @@
       $loop++;
     }
 
+    // removing repeated ids
+
+    foreach ($amres["results"]["songs"]["data"] as $amr)
+    {
+      $amrs[$amr["id"]] = $amr;
+    }
+
     // grouping by album id, composer name and work title
 
-    foreach ($amres["results"]["songs"]["data"] as $alb)
+    foreach ($amrs as $alb)
     {
       unset ($performers);
 
@@ -394,7 +401,14 @@
         }
       }
 
-      $data = $spalbums["results"]["songs"]["data"];
+      // removing repeated ids
+
+      foreach ($spalbums["results"]["songs"]["data"] as $amr)
+      {
+        $amrs[$amr["id"]] = $amr;
+      }
+
+      $data = $amrs;
     }
     else if ($return == "tracks")
     {
