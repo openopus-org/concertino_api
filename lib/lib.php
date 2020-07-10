@@ -221,6 +221,8 @@
 
     $guessedworks = openopusdownparse ("dyn/work/guess/", ["works"=>"[". json_encode (["composer" => $extras["composer"]["complete_name"], "title" => $extras["work"]["title"]]). "]"]);
 
+    print_r ($guessedworks);
+
     if (isset ($guessedworks["composers"]))
     {
       $extras["composer"] = $guessedworks["composers"][0]["guessed"];
