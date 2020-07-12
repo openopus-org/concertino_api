@@ -58,19 +58,34 @@
 
     foreach ($appleres as $k => $alb)
     {
+      if (stripos ($alb["work"]["id"], "at*") === false)
+      {
+        $returnworks[$alb["work"]["id"]] = $alb["work"];
+      }
+
+      if ($alb["work"]["composer"]["id"])
+      {
+        $returncomposers[$alb["work"]["composer"]["id"]] = $alb["work"]["composer"];
+      }
+
       $appleres[$k]["performers"] = allperformers ($alb["performers"], $rldb, $alb["work"]["composer"]["complete_name"]);
     }
 
     $apireturn["recordings"] = $appleres;
-    
-    if ($apple["next"] == "true")
-    {
-        $apireturn["next"] = $_REQUEST["offset"] + 100;
-    }
   }
 
   if (isset ($apireturn["recordings"]))
   {
+    if (sizeof ($returnworks) <= 2)
+    {
+      $apireturn["works"] = array_values ($returnworks);
+    }
+    
+    if (sizeof ($returncomposers) <= 2)
+    {
+      $apireturn["composers"] = array_values ($returncomposers);
+    }
+
     $apireturn["status"] = Array ("success"=>"true", "source" => "ext", "rows"=>sizeof ($apireturn["recordings"]), "country"=>($_REQUEST["country"] ? $_REQUEST["country"] : "us"));  
     $apireturn["status"]["stats"] = Array 
     (
@@ -78,6 +93,11 @@
       "useful_responses" => $apireturn["status"]["rows"],
       "usefulness_rate" => round(100*($apireturn["status"]["rows"]/count ($applefirstres)), 2). "%"
     );
+
+    if ($apple["next"] == "true")
+    {
+      $apireturn["next"] = $_REQUEST["offset"] + 100;
+    }
 
     $apireturn = compilationdigest ($apireturn, true);
 
