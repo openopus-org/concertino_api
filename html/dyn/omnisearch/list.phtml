@@ -136,7 +136,8 @@
       {
         if (isset ($oors["work"]))
         {
-          $apireturn["works"][$oors["work"]["id"]] = $oors;
+          $apireturn["works"][$oors["work"]["id"]] = $oors["work"];
+          $apireturn["works"][$oors["work"]["id"]]["composer"] = $oors["composer"];
         }
         else
         {
@@ -159,6 +160,7 @@
 
       // putting everything together
 
+      $apireturn["status"]["rows"] = sizeof ($recordings);
       $apireturn["composers"] = array_values ($apireturn["composers"]);
       $apireturn["works"] = array_slice ($apireturn["works"], 0, 10);
 
