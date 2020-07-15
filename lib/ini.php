@@ -44,7 +44,7 @@
 
   // omnisearch forbidden words
 
-  $omnisearch_forbidden = Array ("symphony", "sinfonietta", "orquesta", "orchestra", "symphonic", "philharmonic", "duo", "trio", "quartet", "quintet", "sextet", "septet", "octet", "opera", "the", "and", "of", "by", "from");
+  $omnisearch_forbidden = Array ("symphony", "symphonique", "symphoniker", "symphonie", "sinfonietta", "orquesta", "orchestra", "symphonic", "philharmonic", "duo", "trio", "quartet", "quintet", "sextet", "septet", "octet", "opera", "the", "and", "of", "by", "from");
 
   // likely trashy compilation albums
 
