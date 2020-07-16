@@ -30,7 +30,7 @@
   {
     // listing results
 
-    $sql = "select concat(recording.work_id,'-',recording.apple_albumid,'-',recording.subset) as id, recording.observation as observation, recording.subset, recording.verified, recording.apple_albumid, recording.work_id as work, recording.composer_name, recording.work_title, apple_imgurl as cover, performer, role, ({$relevancematch}) as relevance, ({$composermatch}) as composerrelevance from recording, recording_performer, omnisearch where omnisearch.work_id = recording.work_id and omnisearch.apple_albumid = recording.apple_albumid and omnisearch.subset = recording.subset and {$wherematch} and recording_performer.work_id = recording.work_id and recording_performer.subset = recording.subset and recording_performer.apple_albumid = recording.apple_albumid order by composerrelevance desc, relevance desc, plays desc, omnisearch.popular desc, omnisearch.recommended desc, work asc, recording.apple_albumid asc, recording.subset asc limit 100 offset {$_REQUEST["offset"]}";
+    $sql = "select GROUP_CONCAT(concat(recording_performer.performer,'|',recording_performer.role) SEPARATOR '||') as performers, concat(recording.work_id,'-',recording.apple_albumid,'-',recording.subset) as id, recording.observation as observation, recording.subset, recording.verified, recording.apple_albumid, recording.work_id as work, recording.composer_name, recording.work_title, apple_imgurl as cover, ({$relevancematch}) as relevance, ({$composermatch}) as composerrelevance from recording, recording_performer, omnisearch where omnisearch.work_id = recording.work_id and omnisearch.apple_albumid = recording.apple_albumid and omnisearch.subset = recording.subset and {$wherematch} and recording_performer.work_id = recording.work_id and recording_performer.subset = recording.subset and recording_performer.apple_albumid = recording.apple_albumid group by recording.work_id, recording.apple_albumid, recording.subset order by composerrelevance desc, relevance desc, plays desc, omnisearch.popular desc, omnisearch.recommended desc, work asc, recording.apple_albumid asc, recording.subset asc limit 25 offset {$_REQUEST["offset"]}";
     $recordings = mysqlfetch ($mysql, $sql);
 
     if (!$recordings)
@@ -56,26 +56,24 @@
 
       foreach ($recordings as $rec)
       {
-        if ($lastid != $rec["id"])
+        $apireturn["recordings"][$rec["id"]] = Array
+          (
+            "apple_albumid" => $rec["apple_albumid"],
+            "set" => (Int) $rec["subset"],
+            "cover" => $rec["cover"],
+            "observation" => $rec["observation"],
+            "verified" => $rec["verified"],
+            "relevance" => $rec["relevance"]
+          );
+
+        foreach (explode ("||", $rec["performers"]) as $perf)
         {
-          $id = $id + 1;
-          $vid = slug ($obworks["works"]["w:". $rec["work"]]["composer"]["name"]. "-". $obworks["works"]["w:". $rec["work"]]["title"]. "-". $id);
-          $apireturn["recordings"][$vid] = Array
-            (
-              "apple_albumid" => $rec["apple_albumid"],
-              "set" => (Int) $rec["subset"],
-              "cover" => $rec["cover"],
-              "observation" => $rec["observation"],
-              "verified" => $rec["verified"],
-              "relevance" => $rec["relevance"]
-            );
+          $apireturn["recordings"][$rec["id"]]["performers"][] = Array ("name"=>explode ("|", $perf)[0],"role"=>explode ("|", $perf)[1]);
         }
-
-        $apireturn["recordings"][$vid]["performers"][] = Array ("name"=>$rec["performer"],"role"=>$rec["role"]);
-
+        
         if ($rec["composer_name"])
         {
-          $apireturn["recordings"][$vid]["work"] = Array
+          $apireturn["recordings"][$rec["id"]]["work"] = Array
           (
             "composer"=>Array
               (
@@ -91,7 +89,7 @@
         }
         else
         {
-          $apireturn["recordings"][$vid]["work"] = Array
+          $apireturn["recordings"][$rec["id"]]["work"] = Array
           (
             "composer"=>Array
               (
@@ -105,8 +103,6 @@
             "genre"=>$obworks["works"]["w:". $rec["work"]]["genre"]
           );
         }
-
-        $lastid = $rec["id"];
       }
 
       // performers
@@ -146,7 +142,7 @@
         }
 
         $apireturn["recordings"] = $apireturn["valid-recordings"];
-        unset($apireturn["valid-recordings"]);
+        unset ($apireturn["valid-recordings"]);
       }
 
       // composers and works search
@@ -208,9 +204,9 @@
       $apireturn["composers"] = array_values ($apireturn["composers"]);
       $apireturn["works"] = array_slice (array_values ($apireturn["works"]), 0, 5);
 
-      if (sizeof ($recordings) == 100)
+      if (sizeof ($recordings) == 25)
       {
-          $apireturn["next"] = $_REQUEST["offset"] + 100;
+          $apireturn["next"] = $_REQUEST["offset"] + 25;
       }
     }
   }
