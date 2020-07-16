@@ -176,8 +176,17 @@
   
         foreach ($ranking as $rk)
         {
-          $apireturn["works"][$rk["work_id"]] = $worksdb["w:". $rk["work_id"]];
+          $apireturn["works"]["w:". $rk["work_id"]] = $worksdb["w:". $rk["work_id"]];
         }
+
+        foreach ($worksdb as $wk)
+        {
+          $apireturn["works"]["w:". $wk["id"]] = $wk;
+        }
+      }
+      else
+      {
+        $apireturn["works"] = $worksdb;
       }
 
       // is there any dominant composer or work?
@@ -189,19 +198,15 @@
 
         if ($obworks["abstract"]["works"]["rows"] == 1)
         {
-          $apireturn["works"][$wrk["id"]] = $wrk;
+          $apireturn["works"]["w:". $wrk["id"]] = $wrk;
         }
-      }
-      else
-      {
-        $apireturn["works"] = null;
       }
 
       // putting everything together
 
       $apireturn["status"]["rows"] = sizeof ($recordings);
       $apireturn["composers"] = array_values ($apireturn["composers"]);
-      $apireturn["works"] = array_values ($apireturn["works"]);
+      $apireturn["works"] = array_slice (array_values ($apireturn["works"]), 0, 5);
 
       if (sizeof ($recordings) == 100)
       {
