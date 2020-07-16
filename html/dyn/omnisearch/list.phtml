@@ -106,10 +106,10 @@
           );
         }
 
-        
-
         $lastid = $rec["id"];
       }
+
+      // performers
 
       $apirecordings = $apireturn["recordings"];
 
@@ -157,8 +157,9 @@
       {
         if (isset ($oors["work"]))
         {
-          $apireturn["works"][$oors["work"]["id"]] = $oors["work"];
-          $apireturn["works"][$oors["work"]["id"]]["composer"] = $oors["composer"];
+          $worksdb["w:". $oors["work"]["id"]] = $oors["work"];
+          $worksdb["w:". $oors["work"]["id"]]["composer"] = $oors["composer"];
+          $worksids[] = $oors["work"]["id"];
         }
         else
         {
@@ -166,11 +167,24 @@
         }
       }
 
+      // ordering works by popularity
+
+      if (sizeof ($worksids) > 1)
+      {
+        $sql = "select sum(plays) pl, work_id from omnisearch where work_id in (". implode (",", $worksids). ") group by work_id order by pl desc limit 5";
+        $ranking = mysqlfetch ($mysql, $sql);
+  
+        foreach ($ranking as $rk)
+        {
+          $apireturn["works"][$rk["work_id"]] = $worksdb["w:". $rk["work_id"]];
+        }
+      }
+
       // is there any dominant composer or work?
 
       if ($obworks["abstract"]["composers"]["rows"] == 1)
       {
-        $wrk = array_values($obworks["works"])[0];
+        $wrk = array_values ($obworks["works"])[0];
         $apireturn["composers"][$wrk["composer"]["id"]] = $wrk["composer"];
 
         if ($obworks["abstract"]["works"]["rows"] == 1)
@@ -178,12 +192,16 @@
           $apireturn["works"][$wrk["id"]] = $wrk;
         }
       }
+      else
+      {
+        $apireturn["works"] = null;
+      }
 
       // putting everything together
 
       $apireturn["status"]["rows"] = sizeof ($recordings);
       $apireturn["composers"] = array_values ($apireturn["composers"]);
-      $apireturn["works"] = array_slice ($apireturn["works"], 0, 10);
+      $apireturn["works"] = array_values ($apireturn["works"]);
 
       if (sizeof ($recordings) == 100)
       {
