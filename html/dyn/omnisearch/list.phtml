@@ -147,60 +147,64 @@
 
       // composers and works search
 
-      $omniopus = openopusdownparse ("omnisearch/". urlencode ($_REQUEST["originalsearch"]). "/0.json");
-
-      foreach ($omniopus["results"] as $oors)
+      if (!$_REQUEST["offset"])
       {
-        if (isset ($oors["work"]))
+        $omniopus = openopusdownparse ("omnisearch/". urlencode ($_REQUEST["originalsearch"]). "/0.json");
+
+        foreach ($omniopus["results"] as $oors)
         {
-          $worksdb["w:". $oors["work"]["id"]] = $oors["work"];
-          $worksdb["w:". $oors["work"]["id"]]["composer"] = $oors["composer"];
-          $worksids[] = $oors["work"]["id"];
+          if (isset ($oors["work"]))
+          {
+            $worksdb["w:". $oors["work"]["id"]] = $oors["work"];
+            $worksdb["w:". $oors["work"]["id"]]["composer"] = $oors["composer"];
+            $worksids[] = $oors["work"]["id"];
+          }
+          else
+          {
+            $apireturn["composers"][$oors["composer"]["id"]] = $oors["composer"];
+          }
+        }
+  
+        // ordering works by popularity
+  
+        if (sizeof ($worksids) > 1)
+        {
+          $sql = "select sum(plays) pl, work_id from omnisearch where work_id in (". implode (",", $worksids). ") group by work_id order by pl desc limit 5";
+          $ranking = mysqlfetch ($mysql, $sql);
+    
+          foreach ($ranking as $rk)
+          {
+            $apireturn["works"]["w:". $rk["work_id"]] = $worksdb["w:". $rk["work_id"]];
+          }
+  
+          foreach ($worksdb as $wk)
+          {
+            $apireturn["works"]["w:". $wk["id"]] = $wk;
+          }
         }
         else
         {
-          $apireturn["composers"][$oors["composer"]["id"]] = $oors["composer"];
+          $apireturn["works"] = $worksdb;
         }
-      }
-
-      // ordering works by popularity
-
-      if (sizeof ($worksids) > 1)
-      {
-        $sql = "select sum(plays) pl, work_id from omnisearch where work_id in (". implode (",", $worksids). ") group by work_id order by pl desc limit 5";
-        $ranking = mysqlfetch ($mysql, $sql);
   
-        foreach ($ranking as $rk)
+        // is there any dominant composer or work?
+  
+        if ($obworks["abstract"]["composers"]["rows"] == 1)
         {
-          $apireturn["works"]["w:". $rk["work_id"]] = $worksdb["w:". $rk["work_id"]];
-        }
-
-        foreach ($worksdb as $wk)
-        {
-          $apireturn["works"]["w:". $wk["id"]] = $wk;
-        }
-      }
-      else
-      {
-        $apireturn["works"] = $worksdb;
-      }
-
-      // is there any dominant composer or work?
-
-      if ($obworks["abstract"]["composers"]["rows"] == 1)
-      {
-        $wrk = array_values ($obworks["works"])[0];
-        $apireturn["composers"][$wrk["composer"]["id"]] = $wrk["composer"];
-
-        if ($obworks["abstract"]["works"]["rows"] == 1)
-        {
-          $apireturn["works"]["w:". $wrk["id"]] = $wrk;
+          $wrk = array_values ($obworks["works"])[0];
+          $apireturn["composers"][$wrk["composer"]["id"]] = $wrk["composer"];
+  
+          if ($obworks["abstract"]["works"]["rows"] == 1)
+          {
+            $apireturn["works"]["w:". $wrk["id"]] = $wrk;
+          }
         }
       }
 
       // putting everything together
 
       $apireturn["status"]["rows"] = sizeof ($recordings);
+
       $apireturn["composers"] = array_values ($apireturn["composers"]);
       $apireturn["works"] = array_slice (array_values ($apireturn["works"]), 0, 5);
 

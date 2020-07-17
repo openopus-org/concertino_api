@@ -76,6 +76,7 @@
 
   if (isset ($apireturn["recordings"]))
   {
+    /*
     if (sizeof ($returnworks) <= 2)
     {
       $apireturn["works"] = array_values ($returnworks);
@@ -85,7 +86,8 @@
     {
       $apireturn["composers"] = array_values ($returncomposers);
     }
-
+    */
+    
     $apireturn["status"] = Array ("success"=>"true", "source" => "ext", "rows"=>sizeof ($apireturn["recordings"]), "country"=>($_REQUEST["country"] ? $_REQUEST["country"] : "us"));  
     $apireturn["status"]["stats"] = Array 
     (
