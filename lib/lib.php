@@ -102,7 +102,7 @@
               "id" => $alb["attributes"]["playParams"]["id"],
               "full_title" => $alb["attributes"]["name"],
               "title" => $work_title,
-              "subtitle" => $subtitle,
+              "subtitle" => trim ($subtitle),
               "composer" => $alb["attributes"]["composerName"],
               "performers" => $performers,
               "singletrack" => $singletrack
