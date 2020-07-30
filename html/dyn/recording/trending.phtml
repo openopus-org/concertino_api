@@ -30,6 +30,7 @@
     {
         $apireturn["recordings"][$rec["id"]] = Array
         (
+            "position" => ++$position,
             "apple_albumid" => $rec["apple_albumid"],
             "set" => (Int) $rec["subset"],
             "cover" => $rec["cover"],
