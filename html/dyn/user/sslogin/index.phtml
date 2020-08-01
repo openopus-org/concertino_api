@@ -41,7 +41,8 @@
       }
       
       $apireturn["status"]["success"] = "true";
-      $apireturn["user"] = Array ("apple_recid" => $_REQUEST["recid"], "id" => (Integer) $_REQUEST["id"]);
+      $udb = mysqlfetch ($mysql, "select heavyuser from user where id='{$_REQUEST["id"]}'");
+      $apireturn["user"] = Array ("apple_recid" => $_REQUEST["recid"], "id" => (Integer) $_REQUEST["id"], "heavyuser" => (Integer) $udb[0]["heavyuser"]);
     }
     else
     {
@@ -54,7 +55,7 @@
 
       $apireturn["status"]["success"] = "true";
       $udb = mysqlfetch ($mysql, "select auth from user where id='$uid'");
-      $apireturn["user"] = Array ("apple_recid" => $_REQUEST["recid"], "id" => $uid, "auth" => $udb[0]["auth"]); 
+      $apireturn["user"] = Array ("apple_recid" => $_REQUEST["recid"], "id" => $uid, "auth" => $udb[0]["auth"], "heavyuser" => 0); 
 
       $_REQUEST["id"] = $uid;
     }
