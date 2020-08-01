@@ -20,7 +20,6 @@
     define ("DBHOST", "localhost"); // mysql host address
     define ("DBUSER", "username"); // mysql username
     define ("DBPASS", "password"); // mysql password
-    define ("DBFIRSTUSER", "1"); // first actual user id on the database
 
     // admin
 
