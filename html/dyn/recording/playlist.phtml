@@ -122,10 +122,20 @@
           $apireturn["valid-recordings"][] = $recss;
         }
       }
-
-      $apireturn["recordings"] = $apireturn["valid-recordings"];
-      unset($apireturn["valid-recordings"]);
     }
+    else
+    {
+      foreach ($apireturn["recordings"] as $recss)
+      {
+        if ($recss["work"]["composer"]["name"])
+        {
+          $apireturn["valid-recordings"][] = $recss;
+        }
+      }
+    }
+
+    $apireturn["recordings"] = $apireturn["valid-recordings"];
+    unset($apireturn["valid-recordings"]);
   }
 
   if (isset ($apireturn["recordings"]))
