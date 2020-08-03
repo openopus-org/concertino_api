@@ -35,19 +35,14 @@
     {
       if ($rec["composer_name"] == "")
       {
-        echo $rec["composer_name"]. " - ". $rec["work"]. "- hoooo\n";
-        $worklist[] = $rec["work"];
+        if (is_int ($rec["work"])) $worklist[] = $rec["work"];
       }
     }
-
-    print_r ($worklist);
 
     if (sizeof ($worklist))
     {
       $obworks = openopusdownparse ("work/list/{$_REQUEST["cid"]}/ids/". implode (",", array_unique ($worklist)). ".json");
     }
-
-    print_r ($obworks);
     
     foreach ($recordings as $rec)
     {
