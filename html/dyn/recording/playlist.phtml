@@ -33,7 +33,7 @@
 
     foreach ($recordings as $rec)
     {
-      if (!$rec["composer_name"])
+      if ($rec["composer_name"] == "")
       {
         $worklist[] = $rec["work"];
       }
