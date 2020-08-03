@@ -117,7 +117,7 @@
 
       foreach ($apireturn["recordings"] as $recss)
       {
-        if (in_array ($recss["apple_albumid"], $albschkd))
+        if (in_array ($recss["apple_albumid"], $albschkd) && $recss["composer"]["name"])
         {
           $apireturn["valid-recordings"][] = $recss;
         }
