@@ -1,11 +1,11 @@
 # concertino_api
 [Concertino](https://getconcertino.com) is a classical music front-end for Apple Music.
 
-It's splitted in several projects. **This one provides only the data API**, used by our [HTML/JS client](https://github.com/openopus-org/concertino_player). It's written in PHP and relies on a MySQL database. It consumes the Apple Music API, therefore it can't be used by more than one client. So, if you plan to use the Concertino API in your app, you'll have to fork it beforehand.
+It's splitted in several projects. **This one provides only the data API**, used by our [web client](https://github.com/openopus-org/concertino_player) and by our [iPhone app](https://github.com/openopus-org/concertino_ios). It's written in PHP and relies on a MySQL database. It consumes the Apple Music API, therefore it can't be used by more than one client. So, if you plan to use the Concertino API in your app, you'll have to fork it beforehand.
 
 ## Usage
 
-It's a public RESTful API which returns data in JSON format. There is a [wiki](https://wiki.openopus.org/wiki/Using_the_Concertmaster/Concertino_API) explaining all endpoints and data structures. No registration needed, but create/edit/delete endpoints require simple authentication.
+It's a public RESTful API which returns data in JSON format. A [wiki](https://wiki.openopus.org/wiki/Using_the_Concertmaster/Concertino_API) explaining all endpoints and data structures is planned. No registration needed, but create/edit/delete endpoints require simple authentication.
 
 ## How to build
 
@@ -42,15 +42,17 @@ vim /etc/environment
 ```
 
 ```bash
-export BASEHTMLDIR="/var/www/concertino_api/html"
+export CTINHTMLDIR="/var/www/concertino_api/html"
 ```
 
-3. Update crontab for root (this will set the cache cleaning routines)
+3. Update crontab for root (this will set the cache-cleaning and search-building routines)
 
 ```bash
 # m     h       dom     mon     dow     command
 0       *       *       *       *       /var/www/concertino_api/cln/db.sh
 */30      *       *       *       *       /var/www/concertino_api/cln/user.sh
+0       2       *       *       *       php /var/www/concertino_api/cln/omnisearch.php
+0       3       *       *       1       php /var/www/concertino_api/cln/heavyuser.php
 ```
 
 ## Domains
