@@ -1,6 +1,4 @@
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET AUTOCOMMIT = 0;
-START TRANSACTION;
 SET time_zone = "+00:00";
 
 
@@ -9,50 +7,68 @@ SET time_zone = "+00:00";
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8mb4 */;
 
+CREATE TABLE `omnisearch` (
+  `summary` varchar(6000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `worksummary` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `composersummary` varchar(600) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `composer_id` int(10) UNSIGNED NOT NULL,
+  `work_id` varchar(256) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
+  `apple_albumid` varchar(256) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
+  `subset` int(11) UNSIGNED NOT NULL DEFAULT '1',
+  `recommended` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
+  `popular` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
+  `plays` int(10) UNSIGNED NOT NULL DEFAULT '0',
+  `users` int(10) UNSIGNED NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE `playlist` (
   `id` int(10) UNSIGNED NOT NULL,
   `name` varchar(256) NOT NULL,
-  `user_id` int(12) UNSIGNED NOT NULL
+  `user_id` int(12) UNSIGNED NOT NULL,
+  `cover` varchar(1000) DEFAULT NULL,
+  `public` tinyint(1) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 CREATE TABLE `playlist_recording` (
   `playlist_id` int(10) UNSIGNED NOT NULL,
   `position` int(10) UNSIGNED DEFAULT NULL,
-  `work_id` int(11) UNSIGNED NOT NULL,
+  `work_id` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
   `apple_albumid` varchar(256) CHARACTER SET latin1 NOT NULL,
   `subset` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `recording` (
-  `work_id` int(11) UNSIGNED NOT NULL,
+  `work_id` varchar(256) NOT NULL,
+  `composer_name` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `work_title` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `year` date DEFAULT NULL,
   `recommended` tinyint(1) DEFAULT NULL,
-  `compilation` tinyint(1) DEFAULT 0,
-  `oldaudio` tinyint(1) DEFAULT 0,
+  `compilation` tinyint(1) DEFAULT '0',
+  `oldaudio` tinyint(1) DEFAULT '0',
   `upc` varchar(256) DEFAULT NULL,
   `apple_albumid` varchar(256) NOT NULL,
   `apple_imgurl` varchar(1024) DEFAULT NULL,
-  `subset` int(11) UNSIGNED NOT NULL DEFAULT 1,
-  `verified` tinyint(1) DEFAULT 0,
-  `wrongdata` tinyint(1) DEFAULT 0,
-  `spam` tinyint(1) DEFAULT 0,
-  `badquality` tinyint(1) DEFAULT 0,
+  `subset` int(11) UNSIGNED NOT NULL DEFAULT '1',
+  `verified` tinyint(1) DEFAULT '0',
+  `wrongdata` tinyint(1) DEFAULT '0',
+  `spam` tinyint(1) DEFAULT '0',
+  `badquality` tinyint(1) DEFAULT '0',
   `observation` varchar(1060) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 CREATE TABLE `recording_performer` (
   `apple_albumid` varchar(256) NOT NULL,
-  `work_id` int(11) UNSIGNED NOT NULL,
-  `subset` int(11) UNSIGNED NOT NULL DEFAULT 1,
+  `work_id` varchar(256) NOT NULL,
+  `subset` int(11) UNSIGNED NOT NULL DEFAULT '1',
   `performer` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `role` varchar(256) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 CREATE TABLE `shortrec` (
   `id` int(11) UNSIGNED NOT NULL,
-  `work_id` int(11) UNSIGNED NOT NULL,
+  `work_id` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
   `apple_albumid` varchar(256) CHARACTER SET latin1 NOT NULL,
-  `subset` int(11) NOT NULL DEFAULT 1
+  `subset` int(11) NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `track` (
@@ -70,7 +86,9 @@ CREATE TABLE `user` (
   `id` int(12) UNSIGNED NOT NULL,
   `apple_recid` varchar(128) NOT NULL,
   `auth` varchar(128) NOT NULL,
-  `lastlogin` int(11) UNSIGNED NOT NULL
+  `lastlogin` int(11) UNSIGNED NOT NULL,
+  `country` varchar(10) DEFAULT NULL,
+  `heavyuser` tinyint(1) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 CREATE TABLE `user_composer` (
@@ -87,11 +105,11 @@ CREATE TABLE `user_playlist` (
 
 CREATE TABLE `user_recording` (
   `user_id` int(12) UNSIGNED NOT NULL,
-  `work_id` int(11) UNSIGNED NOT NULL,
+  `work_id` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
   `apple_albumid` varchar(256) CHARACTER SET latin1 NOT NULL,
-  `subset` int(11) NOT NULL DEFAULT 1,
+  `subset` int(11) NOT NULL DEFAULT '1',
   `favorite` tinyint(1) DEFAULT NULL,
-  `plays` int(10) UNSIGNED DEFAULT 0,
+  `plays` int(10) UNSIGNED DEFAULT '0',
   `lastplay` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -102,10 +120,22 @@ CREATE TABLE `user_work` (
   `favorite` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+ALTER TABLE `omnisearch`
+  ADD KEY `recommended` (`recommended`),
+  ADD KEY `popular` (`popular`),
+  ADD KEY `plays` (`plays`),
+  ADD KEY `plays_2` (`plays`,`users`),
+  ADD KEY `apple_albumid_2` (`apple_albumid`,`work_id`,`subset`,`plays`,`users`),
+  ADD KEY `apple_albumid` (`apple_albumid`,`work_id`,`subset`) USING BTREE;
+ALTER TABLE `omnisearch` ADD FULLTEXT KEY `summary` (`summary`);
+ALTER TABLE `omnisearch` ADD FULLTEXT KEY `worksummary` (`worksummary`);
+ALTER TABLE `omnisearch` ADD FULLTEXT KEY `composersummary` (`composersummary`);
+
 ALTER TABLE `playlist`
   ADD PRIMARY KEY (`id`),
   ADD KEY `name` (`name`),
-  ADD KEY `user_id` (`user_id`);
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `public` (`public`);
 
 ALTER TABLE `playlist_recording`
   ADD UNIQUE KEY `playlist_id` (`playlist_id`,`subset`,`work_id`,`apple_albumid`),
@@ -121,7 +151,9 @@ ALTER TABLE `recording`
   ADD KEY `badquality` (`badquality`),
   ADD KEY `wrong` (`wrongdata`),
   ADD KEY `oldaudio` (`oldaudio`),
-  ADD KEY `spam` (`spam`);
+  ADD KEY `spam` (`spam`),
+  ADD KEY `composer_name` (`composer_name`),
+  ADD KEY `work_title` (`work_title`);
 
 ALTER TABLE `recording_performer`
   ADD KEY `role` (`role`),
@@ -142,7 +174,9 @@ ALTER TABLE `user`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `apple_token` (`apple_recid`) USING BTREE,
   ADD KEY `since` (`auth`),
-  ADD KEY `lastlogin` (`lastlogin`);
+  ADD KEY `lastlogin` (`lastlogin`),
+  ADD KEY `country` (`country`),
+  ADD KEY `heavyuser` (`heavyuser`);
 
 ALTER TABLE `user_composer`
   ADD PRIMARY KEY (`user_id`,`composer_id`),
@@ -156,23 +190,24 @@ ALTER TABLE `user_recording`
   ADD PRIMARY KEY (`user_id`,`work_id`,`apple_albumid`,`subset`) USING BTREE,
   ADD KEY `lastplay` (`lastplay`),
   ADD KEY `plays` (`plays`),
-  ADD KEY `favorite` (`favorite`);
+  ADD KEY `favorite` (`favorite`),
+  ADD KEY `apple_albumid` (`apple_albumid`,`work_id`,`subset`),
+  ADD KEY `user_id` (`user_id`);
 
 ALTER TABLE `user_work`
   ADD PRIMARY KEY (`user_id`,`work_id`),
   ADD KEY `favorite` (`favorite`),
   ADD KEY `composer_id` (`composer_id`);
 
+
 ALTER TABLE `playlist`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=225;
 
 ALTER TABLE `shortrec`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=883;
 
 ALTER TABLE `user`
-  MODIFY `id` int(12) UNSIGNED NOT NULL AUTO_INCREMENT;
-COMMIT;
-
+  MODIFY `id` int(12) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17177;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
