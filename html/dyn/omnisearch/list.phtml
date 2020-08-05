@@ -62,8 +62,7 @@
             "set" => (Int) $rec["subset"],
             "cover" => $rec["cover"],
             "observation" => $rec["observation"],
-            "compilation" => $rec["compilation"],
-            "singletrack" => "true",
+            "compilation" => ($rec["compilation"] ? "1" : (any_string (COMPILATION_PERFORMERS, $rec["performers"]) ? "1" : "0")),
             "verified" => $rec["verified"],
             "relevance" => $rec["relevance"]
           );
@@ -205,8 +204,6 @@
 
       // putting everything together
 
-      $apireturn = compilationdigest ($apireturn, true);
-      unset ($apireturn["status"]["stats"]);
       $apireturn["status"]["rows"] = sizeof ($recordings);
 
       $apireturn["composers"] = array_values ($apireturn["composers"]);
