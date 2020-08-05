@@ -62,7 +62,7 @@
             "set" => (Int) $rec["subset"],
             "cover" => $rec["cover"],
             "observation" => $rec["observation"],
-            "compilation" => ($rec["compilation"] ? "1" : (any_string (COMPILATION_PERFORMERS, $rec["performers"]) ? "1" : "0")),
+            "compilation" => ($rec["compilation"] ? "true" : (any_string (COMPILATION_PERFORMERS, $rec["performers"]) ? "true" : "false")),
             "verified" => $rec["verified"],
             "relevance" => $rec["relevance"]
           );
