@@ -92,11 +92,25 @@
 
       if ($_REQUEST["country"])
       {
-        echo savecache ("/recording/{$_REQUEST["country"]}/list/work/{$_REQUEST["id"]}/{$_REQUEST["offset"]}.json", apireturn ($apireturn));
+        if ($_REQUEST["extra"])
+        {
+          echo savecache ("/recording/{$_REQUEST["country"]}/list/work/{$_REQUEST["id"]}/{$_REQUEST["extra"]}/{$_REQUEST["offset"]}.json", apireturn ($apireturn));
+        }
+        else
+        {
+          echo savecache ("/recording/{$_REQUEST["country"]}/list/work/{$_REQUEST["id"]}/{$_REQUEST["offset"]}.json", apireturn ($apireturn));
+        }
       }
       else
       {
-        echo savecache ("/recording/list/work/{$_REQUEST["id"]}/{$_REQUEST["offset"]}.json", apireturn ($apireturn));
+        if ($_REQUEST["extra"])
+        {
+          echo savecache ("/recording/list/work/{$_REQUEST["id"]}/{$_REQUEST["extra"]}/{$_REQUEST["offset"]}.json", apireturn ($apireturn));
+        }
+        else
+        {
+          echo savecache ("/recording/list/work/{$_REQUEST["id"]}/{$_REQUEST["offset"]}.json", apireturn ($apireturn));
+        }
       }
     }
     else
