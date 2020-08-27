@@ -36,6 +36,9 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule recording/detail/work/(.*)/album/(.*)/(.*).json dyn/recording/detail.phtml?wid=$1&aid=$2&set=$3 [L]
 
 RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule album/(.*)/detail/(.*).json dyn/album/detail.phtml?aid=$2&country=$1 [L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule recording/shorturl/work/(.*)/album/(.*)/(.*).json dyn/recording/shorten.phtml?wid=$1&aid=$2&set=$3 [L]
 
 RewriteCond %{REQUEST_FILENAME} !-f

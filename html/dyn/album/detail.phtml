@@ -1,0 +1,95 @@
+<?
+    include_once ("../../../lib/inc.php");
+    global $timesteps;
+
+    if (!$_REQUEST["aid"])
+    {
+        $apireturn["status"] = Array ("success"=>"false", "error"=>"Missing parameteres");
+        $goquery = false;
+    }
+    else
+    {
+        // fetching data from apple music
+
+        $apireturn["status"] = Array ("success"=>"true", "source"=>"ext", "country"=>($_REQUEST["country"] ? $_REQUEST["country"] : "us"));
+        $spot = albumapple ($_REQUEST["aid"], $_REQUEST["country"]);
+
+        $apireturn["album"] = Array 
+            (
+                "apple_albumid" => $_REQUEST["aid"],
+                "title" => $spot["extras"]["title"],
+                "cover" => $spot["extras"]["cover"],
+                "year" => explode ("-", $spot["extras"]["year"])[0],
+                "label" => $spot["extras"]["label"]
+            );
+    }
+
+    foreach ($spot["items"] as $spotres)
+    {
+        $rec = Array
+        (
+            "apple_albumid"=>$_REQUEST["aid"],
+            "apple_tracks"=>Array (),
+            "performers"=>Array (),
+            "tracks"=>Array (),
+        );
+
+        // guessing the performers
+
+        $perfs = openopusdownparse ("dyn/performer/list/", ["names"=>json_encode ($spotres["performers"])]);
+        $rldb = $perfs["performers"]["digest"];
+        $index = 0;
+        
+        foreach ($spotres["tracks"] as $tart)
+        {
+            $trinsert[] = Array
+            (
+                "cd" => $tart["cd"],
+                "index" => $index++,
+                "position" => $tart["position"],
+                "length" => $tart["length"],
+                "title" => $tart["title"],
+                "apple_trackid" => $tart["apple_trackid"],
+                "preview" => $tart["preview"]
+            );
+
+            $rec["tracks"][] = end ($trinsert);
+            $rec["length"] += end($trinsert)["length"];
+        }
+
+        $rec["verified"] = $spot["extras"]["verified"] ? "true" : "false";
+        $rec["cover"] = $spot["extras"]["cover"];
+        $rec["set"] = intval ($_REQUEST["set"]);
+        $rec["year"] = explode ("-", $spot["extras"]["year"])[0];
+        $rec["label"] = $spot["extras"]["label"];
+        $rec["performers"] = allperformers ($spotres["performers"], $rldb, $spotres["work"]["composer"]["complete_name"]);
+
+        // setting auxiliary trackset & setting tracks starting points
+
+        if (isset ($rec["tracks"]) && $rec["apple_albumid"])
+        {
+            $acctiming = 0;
+
+            foreach ($rec["tracks"] as $trid => $track)
+            {
+                $rec["tracks"][$trid]["starting_point"] = $acctiming;
+                $acctiming += $track["length"];
+                $rec["apple_tracks"][] = $rec["tracks"][$trid]["apple_trackid"];
+                $rec["previews"][] = $rec["tracks"][$trid]["preview"];
+            }
+        }
+
+        $apireturn["recordings"][] = Array (
+            "work" => $spotres["work"],
+            "recording" => $rec
+        );
+    }
+
+    if ($_REQUEST["country"])
+    {
+        echo savecache ("/recording/{$_REQUEST["country"]}/detail/work/{$_REQUEST["wid"]}/album/{$_REQUEST["aid"]}/{$_REQUEST["set"]}.json", apireturn ($apireturn));
+    }
+    else 
+    {
+        echo savecache ("/recording/detail/work/{$_REQUEST["wid"]}/album/{$_REQUEST["aid"]}/{$_REQUEST["set"]}.json", apireturn ($apireturn));
+    }

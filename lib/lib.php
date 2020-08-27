@@ -324,6 +324,146 @@
     return Array ("type"=> "tracks", "items"=>$tracks, "stats"=>$stats, "extras"=>$extras);
   }
 
+  // fetch album details from apple
+
+  function albumapple ($apple_albumid, $country = "us")
+  {
+    if (!$country)
+    {
+      $country = "us";
+    }
+
+    $spalbums = appledownparse (APPLEMUSICAPI. "/catalog/{$country}/albums/{$apple_albumid}?l=en-US", APPMUSTOKEN);
+    
+    $extras = Array 
+      (
+        "title" => $spalbums["data"][0]["attributes"]["name"],
+        "label" => $spalbums["data"][0]["attributes"]["recordLabel"],
+        "cover" => str_replace ("{w}x{h}", "320x320", $spalbums["data"][0]["attributes"]["artwork"]["url"]),
+        "year" => $spalbums["data"][0]["attributes"]["releaseDate"]
+      );
+
+    $data = $spalbums["data"][0]["relationships"]["tracks"]["data"];
+
+    foreach ($data as $alb)
+    {
+      if (isset ($alb["attributes"]["workName"]))
+      {
+        $work_title = $alb["attributes"]["workName"];
+      }
+      else
+      {
+        $work_title = explode(":", $alb["attributes"]["name"])[0];
+      }
+
+      preg_match ('/(\(.*?\))/i', $alb["attributes"]["name"], $matches);
+
+      if (sizeof ($matches) > 0)
+      {
+        $subtitle = $matches[sizeof ($matches)-1];
+        $work_title = str_replace ($subtitle, "", $work_title);
+      }
+
+      unset ($performers);
+      $alb["artists"] = preg_split("/(\,|\&)/", $alb["attributes"]["artistName"]);
+      foreach ($alb["artists"] as $kart => $art)
+      {
+        if (!strpos ($art["name"], "/"))
+        {
+          $performers[] = trim ($art);
+        }
+      }
+
+      $tracks[$alb["attributes"]["composerName"]. " | ". trim ($work_title)][] = Array (
+        "composer" => $alb["attributes"]["composerName"],
+        "work" => trim ($work_title),
+        "full_title" => $alb["attributes"]["name"],
+        "title" => trim (str_replace ("(Live)", "", end (explode (":", end (explode ("/", $alb["attributes"]["name"])))))),
+        "cd" => $alb["attributes"]["discNumber"],
+        "position" => $alb["attributes"]["trackNumber"],
+        "length" => round ($alb["attributes"]["durationInMillis"] / 1000, 0, PHP_ROUND_HALF_UP),
+        "apple_trackid" => $alb["id"],
+        "preview" => $alb["attributes"]["previews"][0]["url"],
+        "performers" => $performers
+      );
+
+      $works[] = ["composer" => $alb["attributes"]["composerName"], "title" => trim ($work_title)];
+    }
+
+    // guessing composer and works
+
+    $guessedworks = openopusdownparse ("dyn/work/guess/", ["works"=>json_encode ($works)]);
+
+    foreach ($guessedworks["works"] as $gwork)
+    {
+      $worksdb[str_replace ("-", "", slug ($gwork["requested"]["composer"])). "-". str_replace ("-", "", slug (worksimplifier ($gwork["requested"]["title"])))] = $gwork["guessed"];
+    }
+
+    foreach ($guessedworks["composers"] as $gcmp)
+    {
+      $compsdb[str_replace ("-", "", slug ($gcmp["requested"]))] = $gcmp["guessed"];
+    }
+
+    // compiling album array
+
+    foreach ($tracks as $ktr => $tr)
+    {
+      $comp = str_replace ("-", "", slug ($tr[0]["composer"]));
+      $wk = str_replace ("-", "", slug (worksimplifier ($tr[0]["work"])));
+
+      if (isset ($worksdb[$comp. "-". $wk]))
+      {
+        $rwork = $worksdb[$comp. "-". $wk];
+      }
+      else 
+      {
+        $rwork = [
+          "id" => "at*{$tr[0]["apple_trackid"]}", 
+          "title" => $tr["work"], 
+          "genre"=>"None"];
+
+        if (isset ($compsdb[$comp]))
+        {
+          $rwork["composer"] = $compsdb[$comp];
+        }
+        else
+        {
+          $rwork["composer"] = [
+            "complete_name" => $tr["composer"],
+            "id" => "0",
+            "name" => $tr["composer"],
+            "epoch" => "None"]; 
+        }
+      }
+
+      $return[$ktr] = Array (
+        "work" => $rwork,
+        "performers" => $tr[0]["performers"]
+      );
+
+      foreach ($tr as $track)
+      {
+        $return[$ktr]["tracks"][] = Array (
+          "title" => $track["title"],
+          "cd" => $track["cd"],
+          "position" => $track["position"],
+          "length" => $track["length"],
+          "apple_trackid" => $track["apple_trackid"],
+          "preview" => $track["preview"]
+        );
+      }
+    }
+
+    $stats = Array 
+      (
+        "apple_responses" => count ($data),
+        "useful_responses" => count ($data),
+        "usefulness_rate" => "100%"
+      );
+
+    return Array ("type"=> "tracks", "items"=>array_values ($return), "stats"=>$stats, "extras"=>$extras);
+  }
+
   // fetch and analyze apple music metadata
 
   function fetchapple ($work, $return, $offset = 0, $pagelimit = 0, $country = "us", $extra = "")
