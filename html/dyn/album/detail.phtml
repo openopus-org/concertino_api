@@ -20,7 +20,8 @@
                 "title" => $spot["extras"]["title"],
                 "cover" => $spot["extras"]["cover"],
                 "year" => explode ("-", $spot["extras"]["year"])[0],
-                "label" => $spot["extras"]["label"]
+                "label" => $spot["extras"]["label"],
+                "length" => 0
             );
     }
 
@@ -55,6 +56,7 @@
 
             $rec["tracks"][] = end ($trinsert);
             $rec["length"] += end($trinsert)["length"];
+            $apireturn["album"]["length"] += end($trinsert)["length"];
         }
 
         $rec["verified"] = $spot["extras"]["verified"] ? "true" : "false";
@@ -74,7 +76,9 @@
             {
                 $rec["tracks"][$trid]["starting_point"] = $acctiming;
                 $acctiming += $track["length"];
+                $apireturn["album"]["apple_tracks"][] = $rec["tracks"][$trid]["apple_trackid"];
                 $rec["apple_tracks"][] = $rec["tracks"][$trid]["apple_trackid"];
+                $apireturn["album"]["previews"][] = $rec["tracks"][$trid]["preview"];
                 $rec["previews"][] = $rec["tracks"][$trid]["preview"];
             }
         }

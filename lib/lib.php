@@ -396,7 +396,7 @@
 
     foreach ($guessedworks["works"] as $gwork)
     {
-      $worksdb[str_replace ("-", "", slug ($gwork["requested"]["composer"])). "-". str_replace ("-", "", slug (worksimplifier ($gwork["requested"]["title"])))] = $gwork["guessed"];
+      $worksdb[str_replace ("-", "", slug ($gwork["requested"]["composer"])). "-". str_replace ("-", "", slug (worksimplifier ($gwork["requested"]["title"])))] = $gwork["guessed"];  
     }
 
     foreach ($guessedworks["composers"] as $gcmp)
@@ -413,25 +413,46 @@
 
       if (isset ($worksdb[$comp. "-". $wk]))
       {
-        $rwork = $worksdb[$comp. "-". $wk];
+        $rwdb = $worksdb[$comp. "-". $wk];
+        $rwork = Array 
+          (
+            "id" => $rwdb["id"],
+            "genre" => $rwdb["genre"],
+            "title" => $rwdb["title"],
+            "subtitle" => $rwdb["subtitle"],
+            "composer" => Array 
+              (
+                "id" => $rwdb["composer"]["id"],
+                "name" => $rwdb["composer"]["name"],
+                "complete_name" => $rwdb["composer"]["complete_name"],
+                "epoch" => $rwdb["composer"]["epoch"]
+              )
+          );
       }
       else 
       {
         $rwork = [
           "id" => "at*{$tr[0]["apple_trackid"]}", 
-          "title" => $tr["work"], 
+          "title" => $tr[0]["work"], 
           "genre"=>"None"];
 
         if (isset ($compsdb[$comp]))
         {
-          $rwork["composer"] = $compsdb[$comp];
+          $rwdbc = $compsdb[$comp];
+          $rwork["composer"] = Array 
+            (
+              "id" => $rwdbc["id"],
+              "name" => $rwdbc["name"],
+              "complete_name" => $rwdbc["complete_name"],
+              "epoch" => $rwdbc["epoch"]
+            );
         }
         else
         {
           $rwork["composer"] = [
-            "complete_name" => $tr["composer"],
+            "complete_name" => $tr[0]["composer"],
             "id" => "0",
-            "name" => $tr["composer"],
+            "name" => $tr[0]["composer"],
             "epoch" => "None"]; 
         }
       }
