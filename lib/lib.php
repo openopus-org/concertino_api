@@ -616,6 +616,8 @@
         }
         else
         {
+          $alb["attributes"]["name"] = str_replace ("&", "and", $alb["attributes"]["name"]);
+
           //echo "\nTRYING: ". str_replace ('-', '', slug ($alb["attributes"]["name"]));
 
           foreach ($wkdb as $wk)
