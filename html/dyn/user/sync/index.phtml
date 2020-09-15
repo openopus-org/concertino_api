@@ -1,0 +1,59 @@
+<?
+  include_once ("../../../../lib/inc.php");
+
+  // identity check
+
+  if (!simpleauth ($mysql, $_REQUEST["id"], $_REQUEST["auth"]))
+  {
+    $apireturn["status"]["success"] = "false";
+    $apireturn["status"]["error"] = "Authentication failed";
+  }
+  else if (!postcheck ($_REQUEST, ["recid"]))
+  {
+    $apireturn["status"]["success"] = "false";
+    $apireturn["status"]["error"] = "Missing fields";
+  }
+  else
+  {
+    $apireturn["status"]["success"] = "true";
+
+    // finding already logged users
+
+    $users = mysqlfetch ($mysql, "select id, auth from user where apple_recid = '{$_REQUEST["recid"]}' and not id = '{$_REQUEST["id"]}' limit 1");
+
+    if (!$users)
+    {
+      // no user found, register the recid
+
+      $query = "update user set apple_recid = '{$_REQUEST["recid"]}' where id = '{$_REQUEST["id"]}'";
+      mysqli_query ($mysql, $query);
+
+      $users = mysqlfetch ($mysql, "select auth from user where id='{$_REQUEST["id"]}'");
+    }
+    else
+    {
+      // user found, transfer recordings and playlists to the master id
+
+      mysqli_query ($mysql, "update ignore user_recording set user_id = '{$users[0]["id"]}' where user_id = '{$_REQUEST["id"]}'");
+      mysqli_query ($mysql, "update playlist set user_id = '{$users[0]["id"]}' where user_id = '{$_REQUEST["id"]}'");
+      mysqli_query ($mysql, "update ignore user_playlist set user_id = '{$users[0]["id"]}' where user_id = '{$_REQUEST["id"]}'");
+      mysqli_query ($mysql, "update user_composer set user_id = '{$users[0]["id"]}' where user_id = '{$_REQUEST["id"]}'");
+      mysqli_query ($mysql, "update user_work set user_id = '{$users[0]["id"]}' where user_id = '{$_REQUEST["id"]}'");
+
+      $_REQUEST["id"] = $users[0]["id"];
+    }
+
+    $apireturn["user"] = Array ("apple_recid" => $_REQUEST["recid"], "id" => $_REQUEST["id"], "auth" => $users[0]["auth"]); 
+
+    // retrieving user's lists 
+
+    $apireturn["works"] = worklist ($_REQUEST["id"]);
+    $apireturn["composerworks"] = workcomposerlist ($_REQUEST["id"]);
+    $apireturn["favoriterecordings"] = favrecordings ($_REQUEST["id"]);
+    $apireturn["favorite"] = composerlist ("favorite", $_REQUEST["id"]);
+    $apireturn["forbidden"] = composerlist ("forbidden", $_REQUEST["id"]);
+    $apireturn["playlists"] = playlists ($_REQUEST["id"]);
+  }
+
+  shell_exec ("rm ". WEBDIR. "/user/{$_REQUEST["id"]}/ -rf");
+  echo apireturn ($apireturn);
