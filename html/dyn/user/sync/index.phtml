@@ -43,7 +43,7 @@
       $_REQUEST["id"] = $users[0]["id"];
     }
 
-    $apireturn["user"] = Array ("apple_recid" => $_REQUEST["recid"], "id" => $_REQUEST["id"], "auth" => $users[0]["auth"]); 
+    $apireturn["user"] = Array ("apple_recid" => $_REQUEST["recid"], "id" => (Int) $_REQUEST["id"], "auth" => $users[0]["auth"]); 
 
     // retrieving user's lists 
 
