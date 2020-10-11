@@ -97,6 +97,22 @@
 
           $singletrack = (isset ($return[$apple_albumid]["tracks"][str_replace ("-", "", slug ($alb["attributes"]["composerName"]))][str_replace ("-", "", slug (worksimplifier ($work_title)))]) ? "false" : "true");
 
+          // treating composers names
+
+          $alb["attributes"]["composerName"] = trim (preg_replace ('(\(.*\))', '', $alb["attributes"]["composerName"]));
+
+          if (stristr ($alb["attributes"]["composerName"], "&") || stristr ($alb["attributes"]["composerName"], ","))
+          {
+            foreach (preg_split("/(\,|\&)/", $alb["attributes"]["composerName"]) as $compexpname)
+            {
+              $compexpnames[slug($compexpname)] = trim ($compexpname);
+            }
+
+            $alb["attributes"]["composerName"] = implode (" & ", $compexpnames);
+          }
+
+          // returning array
+
           $return[$apple_albumid]["tracks"][str_replace ("-", "", slug ($alb["attributes"]["composerName"]))][str_replace ("-", "", slug (worksimplifier ($work_title)))] = Array 
             (
               "id" => $alb["attributes"]["playParams"]["id"],
@@ -199,8 +215,24 @@
     {
       if ($alb["id"] == $trackid)
       {
+        // treating composers names
+
+        $alb["attributes"]["composerName"] = trim (preg_replace ('(\(.*\))', '', $alb["attributes"]["composerName"]));
+
+        if (stristr ($alb["attributes"]["composerName"], "&") || stristr ($alb["attributes"]["composerName"], ","))
+        {
+          foreach (preg_split("/(\,|\&)/", $alb["attributes"]["composerName"]) as $compexpname)
+          {
+            $compexpnames[slug($compexpname)] = trim ($compexpname);
+          }
+
+          $alb["attributes"]["composerName"] = implode (" & ", $compexpnames);
+        }
+
         $extras["composer"]["complete_name"] = $alb["attributes"]["composerName"];
         
+        // treating work title
+
         if (isset ($alb["attributes"]["workName"]))
         {
           $work_title = $alb["attributes"]["workName"];
