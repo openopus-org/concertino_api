@@ -21,9 +21,9 @@
 
     if ($_REQUEST["id"])
     {
-      // if not guest, update apple recommendation id in the concertino db
+      // if not guest or temp, update apple recommendation id in the concertino db
 
-      if (!stristr ($_REQUEST["recid"], "guest"))
+      if (!stristr ($_REQUEST["recid"], "guest-") && !stristr ($_REQUEST["recid"], "temp-"))
       {
         $query = "update user set apple_recid = '{$_REQUEST["recid"]}', lastlogin='". time(). "' where id = '{$_REQUEST["id"]}'";
         mysqli_query ($mysql, $query);
