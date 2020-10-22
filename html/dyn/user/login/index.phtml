@@ -38,7 +38,9 @@
       // registering the user to the concertino db
 
       $query = "insert into user (auth, apple_recid, lastlogin) values ('$auth', '{$_REQUEST["recid"]}', '". time(). "')
-                on duplicate key update id=id, apple_recid='{$_REQUEST["recid"]}', lastlogin=". time();
+                on duplicate key update id=id, lastlogin=". time();
+      /*$query = "insert into user (auth, apple_recid, lastlogin) values ('$auth', '{$_REQUEST["recid"]}', '". time(). "')
+      on duplicate key update id=id, apple_recid='{$_REQUEST["recid"]}', lastlogin=". time();*/
       mysqli_query ($mysql, $query);
       $uid = mysqli_insert_id ($mysql);
 
