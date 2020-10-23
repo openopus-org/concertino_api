@@ -31,8 +31,8 @@
       
       $apireturn["status"]["success"] = "true";
       $udb = mysqlfetch ($mysql, "select heavyuser from user where id='{$_REQUEST["id"]}'");
-      $apireturn["user"] = Array ("apple_recid" => $_REQUEST["recid"], "id" => (Integer) $_REQUEST["id"], "heavyuser" => 0);      
-      //$apireturn["user"] = Array ("apple_recid" => $_REQUEST["recid"], "id" => (Integer) $_REQUEST["id"], "heavyuser" => (Integer) $udb[0]["heavyuser"]);      
+      //$apireturn["user"] = Array ("apple_recid" => $_REQUEST["recid"], "id" => (Integer) $_REQUEST["id"], "heavyuser" => 0);      
+      $apireturn["user"] = Array ("apple_recid" => $_REQUEST["recid"], "id" => (Integer) $_REQUEST["id"], "heavyuser" => (Integer) $udb[0]["heavyuser"]);      
     }
     else
     {
