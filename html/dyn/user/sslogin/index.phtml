@@ -36,7 +36,8 @@
 
       if (!stristr ($_REQUEST["recid"], "guest"))
       {
-        $query = "update user set apple_recid = '{$_REQUEST["recid"]}', lastlogin='". time(). "', country = '{$_REQUEST["country"]}' where id = '{$_REQUEST["id"]}'";
+        //$query = "update user set apple_recid = '{$_REQUEST["recid"]}', lastlogin='". time(). "', country = '{$_REQUEST["country"]}' where id = '{$_REQUEST["id"]}'";
+        $query = "update user set lastlogin='". time(). "', country = '{$_REQUEST["country"]}' where id = '{$_REQUEST["id"]}'";
         mysqli_query ($mysql, $query);
       }
       

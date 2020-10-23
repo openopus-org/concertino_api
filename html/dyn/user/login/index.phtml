@@ -25,7 +25,8 @@
 
       if (!stristr ($_REQUEST["recid"], "guest-") && !stristr ($_REQUEST["recid"], "temp-"))
       {
-        $query = "update user set apple_recid = '{$_REQUEST["recid"]}', lastlogin='". time(). "' where id = '{$_REQUEST["id"]}'";
+        //$query = "update user set apple_recid = '{$_REQUEST["recid"]}', lastlogin='". time(). "' where id = '{$_REQUEST["id"]}'";
+        $query = "update user set lastlogin='". time(). "' where id = '{$_REQUEST["id"]}'";
         mysqli_query ($mysql, $query);
       }
       
