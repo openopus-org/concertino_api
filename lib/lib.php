@@ -511,9 +511,11 @@
     {
       if ($chkret["work"]["id"] != "0")
       {
-        $perfs = openopusdownparse ("dyn/performer/list/", ["names"=>json_encode ($chkret["performers"])]);
-        $chkret["performers"] = allperformers ($chkret["performers"], $perfs["performers"]["digest"], $chkret["work"]["composer"]["complete_name"]);
-        $newkey = "wkid-". $chkret["work"]["id"]. "-". implode ("-", array_keys (array_slice ($perfs["performers"]["digest"], -2, 2, true)));
+        //$perfs = openopusdownparse ("dyn/performer/list/", ["names"=>json_encode ($chkret["performers"])]);
+        //$chkret["performers"] = allperformers ($chkret["performers"], $perfs["performers"]["digest"], $chkret["work"]["composer"]["complete_name"]);
+        //$newkey = "wkid-". $chkret["work"]["id"]. "-". implode ("-", array_keys (array_slice ($perfs["performers"]["digest"], -2, 2, true)));
+
+        $newkey = "wkid-". $chkret["work"]["id"];
 
         if (array_key_exists ($newkey, $newreturn))
         {
