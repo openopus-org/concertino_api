@@ -511,13 +511,17 @@
     {
       if ($chkret["work"]["id"] != "0")
       {
-        if (array_key_exists ("wkid-". $chkret["work"]["id"], $newreturn))
+        $perfs = openopusdownparse ("dyn/performer/list/", ["names"=>json_encode ($chkret["performers"])]);
+        $chkret["performers"] = allperformers ($chkret["performers"], $perfs["performers"]["digest"], $chkret["work"]["composer"]["complete_name"]);
+        $newkey = "wkid-". $chkret["work"]["id"]. "-". implode ("-", array_keys (array_slice ($perfs["performers"]["digest"], -2, 2, true)));
+
+        if (array_key_exists ($newkey, $newreturn))
         {
-          $newreturn["wkid-". $chkret["work"]["id"]]["tracks"] = array_merge ($newreturn["wkid-". $chkret["work"]["id"]]["tracks"], $chkret["tracks"]);
+          $newreturn[$newkey]["tracks"] = array_merge ($newreturn[$newkey]["tracks"], $chkret["tracks"]);
         }
         else
         {
-          $newreturn["wkid-". $chkret["work"]["id"]] = $chkret;
+          $newreturn[$newkey] = $chkret;
         }
       }
       else

@@ -37,8 +37,8 @@
 
         // guessing the performers
 
-        $perfs = openopusdownparse ("dyn/performer/list/", ["names"=>json_encode ($spotres["performers"])]);
-        $rldb = $perfs["performers"]["digest"];
+        //$perfs = openopusdownparse ("dyn/performer/list/", ["names"=>json_encode ($spotres["performers"])]);
+        //$rldb = $perfs["performers"]["digest"];
         $index = 0;
         
         foreach ($spotres["tracks"] as $tart)
@@ -64,7 +64,8 @@
         $rec["set"] = intval ($_REQUEST["set"]);
         $rec["year"] = explode ("-", $spot["extras"]["year"])[0];
         $rec["label"] = $spot["extras"]["label"];
-        $rec["performers"] = allperformers ($spotres["performers"], $rldb, $spotres["work"]["composer"]["complete_name"]);
+        $rec["performers"] = $spotres["performers"];
+        //$rec["performers"] = allperformers ($spotres["performers"], $rldb, $spotres["work"]["composer"]["complete_name"]);
 
         // setting auxiliary trackset & setting tracks starting points
 
