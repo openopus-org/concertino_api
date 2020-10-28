@@ -507,6 +507,27 @@
       }
     }
 
+    foreach ($return as $chkretk => $chkret)
+    {
+      if ($chkret["work"]["id"] != "0")
+      {
+        if (array_key_exists ("wkid-". $chkret["work"]["id"], $newreturn))
+        {
+          $newreturn["wkid-". $chkret["work"]["id"]]["tracks"] = array_merge ($newreturn["wkid-". $chkret["work"]["id"]]["tracks"], $chkret["tracks"]);
+        }
+        else
+        {
+          $newreturn["wkid-". $chkret["work"]["id"]] = $chkret;
+        }
+      }
+      else
+      {
+        $newreturn[$chkretk] = $chkret;
+      }
+    }
+
+    $return = $newreturn;
+
     $stats = Array 
       (
         "apple_responses" => count ($data),

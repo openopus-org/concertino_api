@@ -91,9 +91,9 @@
 
     if ($_REQUEST["country"])
     {
-        echo savecache ("/recording/{$_REQUEST["country"]}/detail/work/{$_REQUEST["wid"]}/album/{$_REQUEST["aid"]}/{$_REQUEST["set"]}.json", apireturn ($apireturn));
+        echo savecache ("/album/{$_REQUEST["country"]}/detail/{$_REQUEST["aid"]}.json", apireturn ($apireturn));
     }
     else 
     {
-        echo savecache ("/recording/detail/work/{$_REQUEST["wid"]}/album/{$_REQUEST["aid"]}/{$_REQUEST["set"]}.json", apireturn ($apireturn));
+        echo savecache ("/album/detail/{$_REQUEST["aid"]}.json", apireturn ($apireturn));
     }

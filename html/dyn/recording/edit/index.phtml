@@ -41,7 +41,7 @@
     {
       // deleting performers
 
-      mysqli_query ($mysql, "delete from recording_performer where work_id={$_REQUEST["wid"]} and apple_albumid='{$_REQUEST["aid"]}' and subset={$_REQUEST["set"]}");
+      mysqli_query ($mysql, "delete from recording_performer where work_id='{$_REQUEST["wid"]}' and apple_albumid='{$_REQUEST["aid"]}' and subset={$_REQUEST["set"]}");
 
       // inserting performers
 
