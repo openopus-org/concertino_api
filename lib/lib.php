@@ -589,6 +589,13 @@
       $work["work"]["searchterms"] = ["hob ". $work["work"]["catalogue_number"]];
     }
 
+    // BWV catalogue exception
+
+    if ($work["work"]["catalogue"] == "BWV")
+    {
+      $work["work"]["searchterms"] = ["BWV.". $work["work"]["catalogue_number"], "BWV ". $work["work"]["catalogue_number"]];
+    }
+
     // searching apple music
 
     $token = APPMUSTOKEN;
