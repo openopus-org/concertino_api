@@ -406,7 +406,7 @@
         }
       }
 
-      $tracks[$alb["attributes"]["composerName"]. " | ". trim ($work_title). " | ". $alb["attributes"]["artistName"]][] = Array (
+      $tracks[$alb["attributes"]["composerName"]. " | ". worksimplifier ($work_title) /*. " | ". $alb["attributes"]["artistName"]*/][] = Array (
         "composer" => $alb["attributes"]["composerName"],
         "work" => trim ($work_title),
         "full_title" => $alb["attributes"]["name"],
@@ -507,6 +507,7 @@
       }
     }
 
+    /*
     foreach ($return as $chkretk => $chkret)
     {
       if ($chkret["work"]["id"] != "0")
@@ -533,6 +534,7 @@
     }
 
     $return = $newreturn;
+    */
 
     $stats = Array 
       (
