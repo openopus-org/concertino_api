@@ -438,6 +438,8 @@
 
     // compiling album array
 
+    $allperformers = Array ();
+
     foreach ($tracks as $ktr => $tr)
     {
       $comp = str_replace ("-", "", slug ($tr[0]["composer"]));
@@ -502,39 +504,38 @@
           "position" => $track["position"],
           "length" => $track["length"],
           "apple_trackid" => $track["apple_trackid"],
-          "preview" => $track["preview"]
+          "preview" => $track["preview"],
+          "performers" => $track["performers"]
         );
+
+        $allperformers = array_merge ($allperformers, $track["performers"]);
       }
     }
 
-    /*
-    foreach ($return as $chkretk => $chkret)
+    // detecting multiple recordings of a same work
+
+    $perfsdb = openopusdownparse ("dyn/performer/list/", ["names"=>json_encode ($allperformers)]);
+
+    foreach ($return as $workkeys => $work)
     {
-      if ($chkret["work"]["id"] != "0")
+      foreach ($work["tracks"] as $track)
       {
-        $perfs = openopusdownparse ("dyn/performer/list/", ["names"=>json_encode ($chkret["performers"])]);
-        $chkret["performers"] = allperformers ($chkret["performers"], $perfs["performers"]["digest"], $chkret["work"]["composer"]["complete_name"]);
-        $newkey = "wkid-". $chkret["work"]["id"]. "-". implode ("-", array_keys (array_slice ($perfs["performers"]["digest"], -2, 2, true)));
-
-        //$newkey = "wkid-". $chkret["work"]["id"];
-
+        $fullperformers = allperformers ($track["performers"], $perfsdb["performers"]["digest"], $work["work"]["composer"]["complete_name"]);
+        $performers = array_slice ($fullperformers, -2, 2, true);
+        $newkey = "wkid-". $work["work"]["id"]. "-". slug(implode ("-", arraykeepvalues ($performers, ["name"])));
+        
         if (array_key_exists ($newkey, $newreturn))
         {
-          $newreturn[$newkey]["tracks"] = array_merge ($newreturn[$newkey]["tracks"], $chkret["tracks"]);
+          $newreturn[$newkey]["tracks"][] = $track;
         }
         else
         {
-          $newreturn[$newkey] = $chkret;
+          $newreturn[$newkey] = ["work" => $work["work"], "performers" => $fullperformers, "tracks" => [$track]];          
         }
-      }
-      else
-      {
-        $newreturn[$chkretk] = $chkret;
       }
     }
 
     $return = $newreturn;
-    */
 
     $stats = Array 
       (
