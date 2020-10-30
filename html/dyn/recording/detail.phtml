@@ -12,9 +12,24 @@
     $work_appletid = str_replace ("at*", "", $_REQUEST["wid"]);
     $apireturn["status"] = Array ("success"=>"true", "source"=>"ext", "country"=>($_REQUEST["country"] ? $_REQUEST["country"] : "us"));
 
-    $spot = detailapple ($_REQUEST["aid"], $work_appletid, $_REQUEST["country"]);
+    // fetching album and looking for the track
+    
+    //$spot = detailapple ($_REQUEST["aid"], $work_appletid, $_REQUEST["country"]);
+    $spot = albumapple ($_REQUEST["aid"], $_REQUEST["country"]);
 
-    $apireturn["work"] = ["id" => $_REQUEST["wid"], "title" => $spot["extras"]["work"]["title"], "subtitle" => $spot["extras"]["work"]["subtitle"], "composer" => $spot["extras"]["composer"], "genre"=>"None"];
+    foreach ($spot["items"] as $recording)
+    {
+      foreach ($recording["tracks"] as $track)
+      {
+        if ($track["apple_trackid"] == $work_appletid)
+        {
+          $apireturn["work"] = $recording["work"];
+          $spot["items"] = $recording["tracks"];
+        }
+      }
+    }
+
+    //$apireturn["work"] = ["id" => $_REQUEST["wid"], "title" => $spot["extras"]["work"]["title"], "subtitle" => $spot["extras"]["work"]["subtitle"], "composer" => $spot["extras"]["composer"], "genre"=>"None"];
     
     $apireturn["recording"] = Array
       (
