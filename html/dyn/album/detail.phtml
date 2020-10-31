@@ -61,7 +61,7 @@
 
         $rec["verified"] = $spot["extras"]["verified"] ? "true" : "false";
         $rec["cover"] = $spot["extras"]["cover"];
-        $rec["set"] = "at*". $spotres["tracks"][0]["apple_trackid"];
+        $rec["set"] = (Int) $spotres["tracks"][0]["apple_trackid"];
         $rec["year"] = explode ("-", $spot["extras"]["year"])[0];
         $rec["label"] = $spot["extras"]["label"];
         $rec["performers"] = $spotres["performers"];

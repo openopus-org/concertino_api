@@ -6,10 +6,12 @@
 
   // new compatible sets
 
-  if (stristr ($_REQUEST["set"], "at*"))
+  $_REQUEST["originalset"] = $_REQUEST["set"];
+
+  if ($_REQUEST["set"] != "1")
   {
-    $_REQUEST["wid"] = $_REQUEST["set"];
-    $_REQUEST["set"] = "1";
+    $_REQUEST["wid"] = "at*". $_REQUEST["set"];
+    $_REQUEST["set"] = 1;
   }
 
   if (stristr ($_REQUEST["wid"], "at*"))
@@ -132,7 +134,7 @@
 
     $apireturn["recording"]["verified"] = $spot["extras"]["verified"] ? "true" : "false";
     $apireturn["recording"]["cover"] = $spot["extras"]["cover"];
-    $apireturn["recording"]["set"] = intval ($_REQUEST["set"]);
+    $apireturn["recording"]["set"] = intval ($_REQUEST["originalset"]);
     $apireturn["recording"]["year"] = explode ("-", $spot["extras"]["year"])[0];
     $apireturn["recording"]["label"] = $spot["extras"]["label"];
     $apireturn["recording"]["performers"] = (end($spotres)["extraperformers"]) ? orderperformers (end($spotres)["extraperformers"]) : allperformers (end($spotres)["performers"], $rldb, $apireturn["work"]["composer"]["complete_name"]);
@@ -155,9 +157,9 @@
 
   if ($_REQUEST["country"])
   {
-    echo savecache ("/recording/{$_REQUEST["country"]}/detail/work/{$_REQUEST["wid"]}/album/{$_REQUEST["aid"]}/{$_REQUEST["set"]}.json", apireturn ($apireturn));
+    echo savecache ("/recording/{$_REQUEST["country"]}/detail/work/{$_REQUEST["wid"]}/album/{$_REQUEST["aid"]}/{$_REQUEST["originalset"]}.json", apireturn ($apireturn));
   }
   else 
   {
-    echo savecache ("/recording/detail/work/{$_REQUEST["wid"]}/album/{$_REQUEST["aid"]}/{$_REQUEST["set"]}.json", apireturn ($apireturn));
+    echo savecache ("/recording/detail/work/{$_REQUEST["wid"]}/album/{$_REQUEST["aid"]}/{$_REQUEST["originalset"]}.json", apireturn ($apireturn));
   }

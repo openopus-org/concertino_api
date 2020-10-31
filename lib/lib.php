@@ -179,7 +179,7 @@
           $rreturn[] = Array
             (
               "apple_albumid" => (string) $apple_albumid,
-              "set" => "at*". $track["id"],
+              "set" => (Int) $track["id"],
               "verified" => "false",
               "cover" => $albums["apple_imgurl"],
               "performers" => $track["performers"],
@@ -209,7 +209,7 @@
         
         $newreturn[$newkey] = $album;
         $newreturn[$newkey]["performers"] = $fullperformers;
-        $newreturn[$newkey]["set"] = "at*". $track["id"];
+        $newreturn[$newkey]["set"] = (Int) $track["id"];
         unset ($newreturn[$newkey]["tracks"]);
       }
     }
