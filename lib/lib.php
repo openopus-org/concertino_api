@@ -203,7 +203,7 @@
     {
       foreach ($album["tracks"] as $track)
       {
-        $fullperformers = allperformers ($track["performers"], $perfsdb["performers"]["digest"], $work["work"]["composer"]["complete_name"]);
+        $fullperformers = allperformers ($track["performers"], $perfsdb["performers"]["digest"], $album["work"]["composer"]["complete_name"]);
         $performers = array_slice ($fullperformers, -2, 2, true);
         $newkey = "wkid-". $album["work"]["id"]. "-". slug(implode ("-", arraykeepvalues ($performers, ["name"])));
         
