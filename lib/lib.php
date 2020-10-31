@@ -59,6 +59,7 @@
         if (sizeof ($performers) && $alb["attributes"]["discNumber"])
         {
           $apple_albumid = explode ("?", end (explode ("/", $alb["attributes"]["url"])))[0];
+          //print_r ([$alb, $alb["attributes"]["url"], $apple_albumid]);
 
           if (!isset ($return[$apple_albumid]))
           {
@@ -402,6 +403,14 @@
         "cover" => str_replace ("{w}x{h}", "320x320", $spalbums["data"][0]["attributes"]["artwork"]["url"]),
         "year" => $spalbums["data"][0]["attributes"]["releaseDate"]
       );
+
+    while ($spalbums["data"][0]["relationships"]["tracks"]["next"])
+    {
+      $moretracks = appledownparse (APPLEMUSICAPIBASE. $spalbums["data"][0]["relationships"]["tracks"]["next"], APPMUSTOKEN);
+
+      $spalbums["data"][0]["relationships"]["tracks"]["data"] = array_merge ($spalbums["data"][0]["relationships"]["tracks"]["data"], $moretracks["data"]);
+      $spalbums["data"][0]["relationships"]["tracks"]["next"] = $moretracks["data"]["next"];
+    }
 
     $data = $spalbums["data"][0]["relationships"]["tracks"]["data"];
 
