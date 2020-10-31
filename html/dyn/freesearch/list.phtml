@@ -20,13 +20,13 @@
     $top_appleres = [];
     $mid_appleres = [];
     $bottom_appleres = [];
-    $allperfs = [];
+    //$allperfs = [];
 
     foreach ($applefirstres as $alb)
     {
       $composersummary = $alb["work"]["composer"]["complete_name"];
       $worksummary = $composersummary. " ". $alb["work"]["title"];
-      $recordingsummary = $worksummary. " ". preg_replace ($forbidden_regexp, "", implode (" ", $alb["performers"]));
+      $recordingsummary = $worksummary. " ". preg_replace ($forbidden_regexp, "", implode (" ", arraykeepvalues ($alb["performers"], ["name"])));
 
       if (in_string ($_REQUEST["search"], $recordingsummary))
       {
@@ -43,7 +43,7 @@
           $bottom_appleres[] = $alb;
         }
 
-        $allperfs = array_merge ($allperfs, $alb["performers"]);
+        //$allperfs = array_merge ($allperfs, $alb["performers"]);
       }
     }
 
@@ -51,9 +51,9 @@
 
     // guessing the performers
 
-    $perfs = openopusdownparse ("dyn/performer/list/", ["names"=>json_encode ($allperfs)]);
-    $rldb = $perfs["performers"]["digest"];
-
+    //$perfs = openopusdownparse ("dyn/performer/list/", ["names"=>json_encode ($allperfs)]);
+    //$rldb = $perfs["performers"]["digest"];
+    
     // adding the performers to the recording items
 
     foreach ($appleres as $k => $alb)
@@ -68,7 +68,7 @@
         $returncomposers[$alb["work"]["composer"]["id"]] = $alb["work"]["composer"];
       }
 
-      $appleres[$k]["performers"] = allperformers ($alb["performers"], $rldb, $alb["work"]["composer"]["complete_name"]);
+      //$appleres[$k]["performers"] = allperformers ($alb["performers"], $rldb, $alb["work"]["composer"]["complete_name"]);
     }
 
     $apireturn["recordings"] = $appleres;

@@ -113,7 +113,7 @@
 
           // returning array
 
-          $return[$apple_albumid]["tracks"][str_replace ("-", "", slug ($alb["attributes"]["composerName"]))][str_replace ("-", "", slug (worksimplifier ($work_title)))] = Array 
+          $return[$apple_albumid]["tracks"][str_replace ("-", "", slug ($alb["attributes"]["composerName"]))][str_replace ("-", "", slug (worksimplifier ($work_title)))][] = Array 
             (
               "id" => $alb["attributes"]["playParams"]["id"],
               "full_title" => $alb["attributes"]["name"],
@@ -141,12 +141,16 @@
       $compsdb[str_replace ("-", "", slug ($gcmp["requested"]))] = $gcmp["guessed"];
     }
 
+    $allperformers = Array ();
+
     foreach ($return as $apple_albumid => $albums)
     {
       foreach ($albums["tracks"] as $comp => $wks)
       {
-        foreach ($wks as $wk => $track)
+        foreach ($wks as $wk => $tracks)
         {
+          $track = $tracks[0];
+
           if (isset ($worksdb[$comp. "-". $wk]))
           {
             $rwork = $worksdb[$comp. "-". $wk];
@@ -175,18 +179,42 @@
           $rreturn[] = Array
             (
               "apple_albumid" => (string) $apple_albumid,
-              "set" => 1,
+              "set" => "at*". $track["id"],
               "verified" => "false",
               "cover" => $albums["apple_imgurl"],
               "performers" => $track["performers"],
               "work" => $rwork,
               "album_name" => $albums["album_name"],
               "compilation" => "false",
-              "singletrack" => $track["singletrack"]
+              "singletrack" => $track["singletrack"],
+              "tracks" => $tracks
             );
+
+          $allperformers = array_merge ($allperformers, $track["performers"]);
         }
       }
     }
+
+    // detecting multiple recordings of a same work in an album
+ 
+    $perfsdb = openopusdownparse ("dyn/performer/list/", ["names"=>json_encode ($allperformers)]);
+
+    foreach ($rreturn as $album)
+    {
+      foreach ($album["tracks"] as $track)
+      {
+        $fullperformers = allperformers ($track["performers"], $perfsdb["performers"]["digest"], $work["work"]["composer"]["complete_name"]);
+        $performers = array_slice ($fullperformers, -2, 2, true);
+        $newkey = "wkid-". $album["work"]["id"]. "-". slug(implode ("-", arraykeepvalues ($performers, ["name"])));
+        
+        $newreturn[$newkey] = $album;
+        $newreturn[$newkey]["performers"] = $fullperformers;
+        $newreturn[$newkey]["set"] = "at*". $track["id"];
+        unset ($newreturn[$newkey]["tracks"]);
+      }
+    }
+
+    $rreturn = $newreturn;
 
     return ["recordings" => $rreturn, "next" => (isset ($amres["results"]["songs"]["next"]) ? "true" : "false")];
   }

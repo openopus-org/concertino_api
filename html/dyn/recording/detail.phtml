@@ -4,6 +4,14 @@
 
   $goquery = true;
 
+  // new compatible sets
+
+  if (stristr ($_REQUEST["set"], "at*"))
+  {
+    $_REQUEST["wid"] = $_REQUEST["set"];
+    $_REQUEST["set"] = "1";
+  }
+
   if (stristr ($_REQUEST["wid"], "at*"))
   {
     // apple music work
