@@ -66,7 +66,7 @@
           "recommended" => $alb["recommended"] ? "true" : "false"
         );
 
-        $return[$ii]["id"] = "wkid-". $_REQUEST["id"]. "-". $alb["apple_albumid"] . "-". slug(implode ("-", arraykeepvalues ($return[$ii]["performers"], ["name"])));
+        $return[$ii]["recording_id"] = "wkid-". $_REQUEST["id"]. "-". $alb["apple_albumid"] . "-". slug(implode ("-", arraykeepvalues ($return[$ii]["performers"], ["name"])));
 
         if ($alb["verified"])
         {

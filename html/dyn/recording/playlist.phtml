@@ -93,7 +93,7 @@
     foreach ($apirecordings as $apid => $apirec)
     {
       $apirecordings[$apid]["performers"] = orderperformers ($apirec["performers"]);
-      $apirecordings[$apid]["id"] = "wkid-". $apirec["work"]["id"]. "-". $apirec["apple_albumid"] . "-". slug(implode ("-", arraykeepvalues ($apirecordings[$apid]["performers"], ["name"])));
+      $apirecordings[$apid]["recording_id"] = "wkid-". $apirec["work"]["id"]. "-". $apirec["apple_albumid"] . "-". slug(implode ("-", arraykeepvalues ($apirecordings[$apid]["performers"], ["name"])));
     }
     
     ksort ($apirecordings);

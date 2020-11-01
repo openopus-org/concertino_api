@@ -211,7 +211,7 @@
         $newreturn[$newkey] = $album;
         $newreturn[$newkey]["performers"] = $fullperformers;
         $newreturn[$newkey]["set"] = (Int) $track["id"];
-        $newreturn[$newkey]["id"] = $newkey;
+        $newreturn[$newkey]["recording_id"] = $newkey;
         unset ($newreturn[$newkey]["tracks"]);
       }
     }
