@@ -206,11 +206,12 @@
       {
         $fullperformers = allperformers ($track["performers"], $perfsdb["performers"]["digest"], $album["work"]["composer"]["complete_name"]);
         $performers = array_slice ($fullperformers, -2, 2, true);
-        $newkey = "wkid-". $album["work"]["id"]. "-". slug(implode ("-", arraykeepvalues ($performers, ["name"])));
+        $newkey = "wkid-". $album["work"]["id"]. "-". $album["apple_albumid"] . "-". slug(implode ("-", arraykeepvalues ($performers, ["name"])));
         
         $newreturn[$newkey] = $album;
         $newreturn[$newkey]["performers"] = $fullperformers;
         $newreturn[$newkey]["set"] = (Int) $track["id"];
+        $newreturn[$newkey]["id"] = $newkey;
         unset ($newreturn[$newkey]["tracks"]);
       }
     }
@@ -443,6 +444,8 @@
         }
       }
 
+      //print_r ([$work_title, worksimplifier ($work_title)]);
+
       $tracks[$alb["attributes"]["composerName"]. " | ". worksimplifier ($work_title) /*. " | ". $alb["attributes"]["artistName"]*/][] = Array (
         "composer" => $alb["attributes"]["composerName"],
         "work" => trim ($work_title),
@@ -559,7 +562,7 @@
       {
         $fullperformers = allperformers ($track["performers"], $perfsdb["performers"]["digest"], $work["work"]["composer"]["complete_name"]);
         $performers = array_slice ($fullperformers, -2, 2, true);
-        $newkey = "wkid-". $work["work"]["id"]. "-". slug(implode ("-", arraykeepvalues ($performers, ["name"])));
+        $newkey = "wkid-". $work["work"]["id"]. "-". $apple_albumid . "-". slug(implode ("-", arraykeepvalues ($performers, ["name"])));
         
         if (array_key_exists ($newkey, $newreturn))
         {
@@ -567,7 +570,7 @@
         }
         else
         {
-          $newreturn[$newkey] = ["work" => $work["work"], "performers" => $fullperformers, "tracks" => [$track]];          
+          $newreturn[$newkey] = ["work" => $work["work"], "performers" => $fullperformers, "tracks" => [$track], "recording_id" => $newkey];          
         }
       }
     }

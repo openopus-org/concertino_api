@@ -65,6 +65,7 @@
         $rec["year"] = explode ("-", $spot["extras"]["year"])[0];
         $rec["label"] = $spot["extras"]["label"];
         $rec["performers"] = $spotres["performers"];
+        $rec["id"] = $spotres["recording_id"];
         //$rec["performers"] = allperformers ($spotres["performers"], $rldb, $spotres["work"]["composer"]["complete_name"]);
 
         // setting auxiliary trackset & setting tracks starting points
