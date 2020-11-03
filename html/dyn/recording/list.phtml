@@ -45,12 +45,17 @@
 
     $spotres = $spot["items"];
 
-    foreach ($spotres as $kalb => $salb)
+    foreach ($spotres as $album)
     {
-      $ii = $ii + 1;
-      $alb = end($salb);
+      foreach ($album as $alb)
+      {
+        // detecting multiple recordings of a same work in an album
 
-      $return[$ii] = Array
+        $fullperformers = allperformers ($alb["performers"], $rldb, $apireturn["work"]["composer"]["complete_name"]);
+        $performers = array_slice ($fullperformers, -2, 2, true);
+        $newkey = "wkid-". $_REQUEST["id"]. "-". $alb["apple_albumid"] . "-". slug(implode ("-", arraykeepvalues ($performers, ["name"])));
+
+        $return[$newkey] = Array
         (
           "year" => explode ("-", $alb["year"])[0],
           "cover" => $alb["apple_imgurl"],
@@ -66,17 +71,19 @@
           "recommended" => $alb["recommended"] ? "true" : "false"
         );
 
-        $return[$ii]["recording_id"] = "wkid-". $_REQUEST["id"]. "-". $alb["apple_albumid"] . "-". slug(implode ("-", arraykeepvalues ($return[$ii]["performers"], ["name"])));
+        $return[$newkey]["recording_id"] = $newkey;
 
         if ($alb["verified"])
         {
-          $vreturn[$ii] = $return[$ii];
-          unset ($return[$ii]);
+          $vreturn[$newkey] = $return[$newkey];
+          unset ($return[$newkey]);
         }
+      }
     }
 
     $apireturn["recordings"] = (sizeof ($vreturn) ? array_merge ($vreturn, $return) : $return);
-    
+    $apireturn["recordings"] = array_values ($apireturn["recordings"]);
+
     if ($spot["extras"]["next"]) 
     {
       parse_str (parse_url ($spot["extras"]["next"])["query"], $next);
