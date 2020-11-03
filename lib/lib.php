@@ -773,6 +773,7 @@
               "full_title" => $alb["attributes"]["name"],
               "title" => trim (end (explode (":", $alb["attributes"]["name"]))),
               "album_name" => $alb["attributes"]["albumName"],
+              "apple_trackid" => $alb["id"],
               "similarity" => $similarity,
               "work_id" => $wid,
               "year" => $year,
