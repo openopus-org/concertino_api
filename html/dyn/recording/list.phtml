@@ -74,18 +74,16 @@
           "recommended" => $alb["recommended"] ? "true" : "false"
         );
 
-        /*
         if ($alb["verified"])
         {
           $vreturn[$newkey] = $return[$newkey];
           unset ($return[$newkey]);
         }
-        */
       }
     }
 
-    //$apireturn["recordings"] = (sizeof ($vreturn) ? array_merge ($vreturn, $return) : $return);
-    $apireturn["recordings"] = array_values ($return);
+    $apireturn["recordings"] = (sizeof ($vreturn) ? array_merge ($vreturn, $return) : $return);
+    $apireturn["recordings"] = array_values ($apireturn["recordings"]);
 
     if ($spot["extras"]["next"]) 
     {
