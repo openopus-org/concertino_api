@@ -60,6 +60,7 @@
           "year" => explode ("-", $alb["year"])[0],
           "cover" => $alb["apple_imgurl"],
           "apple_albumid" => $alb["apple_albumid"],
+          "recording_id" => $newkey,
           "album_name" => $alb["album_name"],
           "singletrack" => ($alb["tracks"] > 1) ? "false" : "true",
           "compilation" => $alb["compilation"] ? "true" : "false",
@@ -73,17 +74,17 @@
           "recommended" => $alb["recommended"] ? "true" : "false"
         );
 
-        $return[$newkey]["recording_id"] = $newkey;
-
+        /*
         if ($alb["verified"])
         {
           $vreturn[$newkey] = $return[$newkey];
           unset ($return[$newkey]);
         }
+        */
       }
     }
 
-    $apireturn["recordings"] = (sizeof ($vreturn) ? array_merge ($vreturn, $return) : $return);
+    //$apireturn["recordings"] = (sizeof ($vreturn) ? array_merge ($vreturn, $return) : $return);
     $apireturn["recordings"] = array_values ($apireturn["recordings"]);
 
     if ($spot["extras"]["next"]) 
