@@ -85,7 +85,7 @@
     }
 
     //$apireturn["recordings"] = (sizeof ($vreturn) ? array_merge ($vreturn, $return) : $return);
-    $apireturn["recordings"] = array_values ($apireturn["recordings"]);
+    $apireturn["recordings"] = array_values ($return);
 
     if ($spot["extras"]["next"]) 
     {
