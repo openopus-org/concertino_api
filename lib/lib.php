@@ -835,7 +835,7 @@
       $where = "work_id={$params["wid"]}";
     }
 
-    $extrarecordings = mysqlfetch ($mysql, "select ifnull(observation,'') observation, apple_imgurl, apple_albumid, subset, year, recommended, compilation, oldaudio, verified, wrongdata, spam, badquality from recording where ". $where);
+    //$extrarecordings = mysqlfetch ($mysql, "select ifnull(observation,'') observation, apple_imgurl, apple_albumid, subset, year, recommended, compilation, oldaudio, verified, wrongdata, spam, badquality from recording where ". $where);
     $extraperformers = mysqlfetch ($mysql, "select apple_albumid, subset, performer, role from recording_performer where " . $where . " order by apple_albumid asc, subset asc");
 
     if ($params["aid"]) $extratracks = mysqlfetch ($mysql, "select cd, position, length, title, apple_trackid from track where " . $where . " order by apple_albumid asc, subset asc, cd asc, position asc");
@@ -846,6 +846,7 @@
       $spot["items"] = $extratracks;
     }
 
+    /*
     foreach ($extrarecordings as $ed)
     {
       if ($params["aid"])
@@ -883,6 +884,7 @@
         }
       }
     }
+    */
 
     foreach ($extraperformers as $ep)
     {
