@@ -44,8 +44,6 @@
       {
         // detecting multiple recordings of a same work in an album
 
-        print_r ($fullperformers);
-
         $fullperformers = allperformers ($alb["performers"], $rldb, $apireturn["work"]["composer"]["complete_name"]);
         $performers = array_slice ($fullperformers, -2, 2, true);
         $newkey = "wkid-". $_REQUEST["id"]. "-". $alb["apple_albumid"] . "-". slug(implode ("-", arraykeepvalues ($performers, ["name"])));
