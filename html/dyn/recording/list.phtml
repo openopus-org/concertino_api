@@ -25,19 +25,12 @@
 
     $spot = fetchapple ($work, "albums", $_REQUEST["offset"], $_REQUEST["limitpage"], $_REQUEST["country"], $_REQUEST["extra"]);
 
-    $allperfs = [];
-
-    foreach ($spot["items"] as $spotalb => $spalb)
-    {
-      $allperfs = array_merge ($allperfs, end($spalb)["performers"]);
-    }
-
     // guessing the performers
 
-    $perfs = openopusdownparse ("dyn/performer/list/", ["names"=>json_encode ($allperfs)]);
+    $perfs = openopusdownparse ("dyn/performer/list/", ["names"=>json_encode ($spot["extras"]["allperformers"])]);
     $rldb = $perfs["performers"]["digest"];
 
-    // adding extradata to apple music results
+    // adding extradata to apple music results -- temporarily disabled
 
     //$spot = extradata ($spot, Array ("wid"=>$_REQUEST["id"]));
 
@@ -50,6 +43,8 @@
       foreach ($album as $alb)
       {
         // detecting multiple recordings of a same work in an album
+
+        print_r ($fullperformers);
 
         $fullperformers = allperformers ($alb["performers"], $rldb, $apireturn["work"]["composer"]["complete_name"]);
         $performers = array_slice ($fullperformers, -2, 2, true);

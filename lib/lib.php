@@ -150,6 +150,11 @@
       {
         foreach ($wks as $wk => $tracks)
         {
+          foreach ($tracks as $trk)
+          {
+            $allperformers = array_merge ($allperformers, $trk["performers"]);
+          }
+
           $track = $tracks[0];
 
           if (isset ($worksdb[$comp. "-". $wk]))
@@ -190,8 +195,6 @@
               "singletrack" => $track["singletrack"],
               "tracks" => $tracks
             );
-
-          $allperformers = array_merge ($allperformers, $track["performers"]);
         }
       }
     }
@@ -694,6 +697,8 @@
       $data = $spalbums["data"][0]["relationships"]["tracks"]["data"];
     }
 
+    $allperformersdb = [];
+
     foreach ($data as $kalb => $alb)
     {
       $simwkdb = 0;
@@ -796,6 +801,8 @@
               "preview" => $alb["attributes"]["previews"][0]["url"],
               "performers" => $performers
             );
+
+            $allperformersdb = array_merge ($allperformersdb, $performers);
           }
 
           $mostsimilar = $similarity;
@@ -816,6 +823,8 @@
     {
       $extras = Array ("next"=>$spalbums["results"]["songs"]["next"]);  
     }
+
+    $extras["allperformers"] = $allperformersdb;
 
     return Array ("type"=> $return, "items"=>${$return}, "stats"=>$stats, "extras"=>$extras);
   }
