@@ -367,7 +367,7 @@
           $tracks[] = Array 
           (
             "full_title" => $alb["attributes"]["name"],
-            "title" => trim (str_replace ("(Live)", "", end (explode (":", end (explode ("/", $alb["attributes"]["name"])))))),
+            "title" => trim (str_replace ("(Live)", "", end (explode (":", end (explode ("/", preg_replace ('(\[.*\])', '', $alb["attributes"]["name"]))))))),
             "cd" => $alb["attributes"]["discNumber"],
             "position" => $alb["attributes"]["trackNumber"],
             "length" => round ($alb["attributes"]["durationInMillis"] / 1000, 0, PHP_ROUND_HALF_UP),
@@ -399,7 +399,7 @@
     }
 
     $spalbums = appledownparse (APPLEMUSICAPI. "/catalog/{$country}/albums/{$apple_albumid}?l=en-US", APPMUSTOKEN);
-    
+
     $extras = Array 
       (
         "title" => $spalbums["data"][0]["attributes"]["name"],
@@ -453,7 +453,7 @@
         "composer" => $alb["attributes"]["composerName"],
         "work" => trim ($work_title),
         "full_title" => $alb["attributes"]["name"],
-        "title" => trim (str_replace ("(Live)", "", end (explode (":", end (explode ("/", $alb["attributes"]["name"])))))),
+        "title" => trim (str_replace ("(Live)", "", end (explode (":", end (explode ("/", preg_replace ('((\[|\().*(\]|\)))', '', $alb["attributes"]["name"]))))))),
         "cd" => $alb["attributes"]["discNumber"],
         "position" => $alb["attributes"]["trackNumber"],
         "length" => round ($alb["attributes"]["durationInMillis"] / 1000, 0, PHP_ROUND_HALF_UP),
@@ -793,7 +793,7 @@
             $tracks[] = Array 
             (
               "full_title" => $alb["attributes"]["name"],
-              "title" => trim (str_replace ("(Live)", "", end (explode (":", end (explode ("/", $alb["attributes"]["name"])))))),
+              "title" => trim (str_replace ("(Live)", "", end (explode (":", end (explode ("/", preg_replace ('((\[|\().*(\]|\)))', '', $alb["attributes"]["name"]))))))),
               "cd" => $alb["attributes"]["discNumber"],
               "position" => $alb["attributes"]["trackNumber"],
               "length" => round ($alb["attributes"]["durationInMillis"] / 1000, 0, PHP_ROUND_HALF_UP),
