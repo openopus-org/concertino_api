@@ -453,7 +453,7 @@
         "composer" => $alb["attributes"]["composerName"],
         "work" => trim ($work_title),
         "full_title" => $alb["attributes"]["name"],
-        "title" => trim (str_replace ("(Live)", "", end (explode (":", end (explode ("/", preg_replace ('((\[|\().*(\]|\)))', '', $alb["attributes"]["name"]))))))),
+        "title" => trim (str_replace ("(Live)", "", end (explode (":", end (explode ("/", preg_replace ('/((\[|\().*(\]|\)))/U', '', $alb["attributes"]["name"]))))))),
         "cd" => $alb["attributes"]["discNumber"],
         "position" => $alb["attributes"]["trackNumber"],
         "length" => round ($alb["attributes"]["durationInMillis"] / 1000, 0, PHP_ROUND_HALF_UP),
@@ -543,6 +543,7 @@
       {
         $return[$ktr]["tracks"][] = Array (
           "title" => $track["title"],
+          "full_title" => $track["full_title"],
           "cd" => $track["cd"],
           "position" => $track["position"],
           "length" => $track["length"],
@@ -793,7 +794,7 @@
             $tracks[] = Array 
             (
               "full_title" => $alb["attributes"]["name"],
-              "title" => trim (str_replace ("(Live)", "", end (explode (":", end (explode ("/", preg_replace ('((\[|\().*(\]|\)))', '', $alb["attributes"]["name"]))))))),
+              "title" => trim (str_replace ("(Live)", "", end (explode (":", end (explode ("/", preg_replace ('/((\[|\().*(\]|\)))/U', '', $alb["attributes"]["name"]))))))),
               "cd" => $alb["attributes"]["discNumber"],
               "position" => $alb["attributes"]["trackNumber"],
               "length" => round ($alb["attributes"]["durationInMillis"] / 1000, 0, PHP_ROUND_HALF_UP),
