@@ -94,7 +94,7 @@
 
           $work_title = trim ($work_title);
 
-          $compworks[str_replace ("-", "", slug ($alb["attributes"]["composerName"])). str_replace ("-", "", slug (worksimplifier ($work_title)))] = ["composer" => $alb["attributes"]["composerName"], "title" => $work_title];
+          $compworks[str_replace ("-", "", slug ($alb["attributes"]["composerName"])). str_replace ("-", "", slug (/*worksimplifier (*/$work_title/*)*/))] = ["composer" => $alb["attributes"]["composerName"], "title" => $work_title];
 
           $singletrack = (isset ($return[$apple_albumid]["tracks"][str_replace ("-", "", slug ($alb["attributes"]["composerName"]))][str_replace ("-", "", slug (worksimplifier ($work_title)))]) ? "false" : "true");
 
@@ -114,7 +114,7 @@
 
           // returning array
 
-          $return[$apple_albumid]["tracks"][str_replace ("-", "", slug ($alb["attributes"]["composerName"]))][str_replace ("-", "", slug (worksimplifier ($work_title)))][] = Array 
+          $return[$apple_albumid]["tracks"][str_replace ("-", "", slug ($alb["attributes"]["composerName"]))][str_replace ("-", "", slug (/*worksimplifier (*/$work_title/*)*/))][] = Array 
             (
               "id" => $alb["attributes"]["playParams"]["id"],
               "full_title" => $alb["attributes"]["name"],
@@ -447,9 +447,7 @@
         }
       }
 
-      //print_r ([$work_title, worksimplifier ($work_title)]);
-
-      $trackey = $alb["attributes"]["composerName"]. " | ". worksimplifier ($work_title);
+      $trackey = $alb["attributes"]["composerName"]. " | ". slug ($work_title);
 
       if (end ($trackindex)["value"] == $trackey)
       {
