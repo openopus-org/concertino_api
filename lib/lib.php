@@ -451,13 +451,15 @@
 
       $trackey = $alb["attributes"]["composerName"]. " | ". worksimplifier ($work_title);
 
-      if (end ($trackindex) == $trackey)
+      if (end ($trackindex)["value"] == $trackey)
       {
-        $trackarrkey = key (end ($trackindex)). "-". $trackey;
+        $trackarrkey = end ($trackindex)["key"]. "-". $trackey;
+        $trackindex[$alb["attributes"]["trackNumber"]] = ["key" => end ($trackindex)["key"], "value" => $trackey];
       }
       else
       {
         $trackarrkey = $alb["attributes"]["trackNumber"]. "-". $trackey;
+        $trackindex[$alb["attributes"]["trackNumber"]] = ["key" => $alb["attributes"]["trackNumber"], "value" => $trackey];
       }
 
       $tracks[$trackarrkey][] = Array (
@@ -472,8 +474,6 @@
         "preview" => $alb["attributes"]["previews"][0]["url"],
         "performers" => $performers
       );
-
-      $trackindex[$alb["attributes"]["trackNumber"]] = $trackey;
 
       $works[] = ["composer" => $alb["attributes"]["composerName"], "title" => trim ($work_title)];
     }
