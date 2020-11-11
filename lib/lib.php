@@ -476,19 +476,25 @@
       $works[] = ["composer" => $alb["attributes"]["composerName"], "title" => trim ($work_title)];
     }
 
+    //print_r ($works);
+
     // guessing composer and works
 
     $guessedworks = openopusdownparse ("dyn/work/guess/", ["works"=>json_encode ($works)]);
 
+    //print_r ($guessedworks);
+
     foreach ($guessedworks["works"] as $gwork)
     {
-      $worksdb[str_replace ("-", "", slug ($gwork["requested"]["composer"])). "-". str_replace ("-", "", slug (worksimplifier ($gwork["requested"]["title"])))] = $gwork["guessed"];  
+      $worksdb[str_replace ("-", "", slug ($gwork["requested"]["composer"])). "-". str_replace ("-", "", slug (/*worksimplifier (*/$gwork["requested"]["title"]/*)*/))] = $gwork["guessed"];  
     }
 
     foreach ($guessedworks["composers"] as $gcmp)
     {
       $compsdb[str_replace ("-", "", slug ($gcmp["requested"]))] = $gcmp["guessed"];
     }
+
+    //print_r ($worksdb);
 
     // compiling album array
 
@@ -497,7 +503,7 @@
     foreach ($tracks as $ktr => $tr)
     {
       $comp = str_replace ("-", "", slug ($tr[0]["composer"]));
-      $wk = str_replace ("-", "", slug (worksimplifier ($tr[0]["work"])));
+      $wk = str_replace ("-", "", slug (/*worksimplifier (*/$tr[0]["work"]/*)*/));
 
       if (isset ($worksdb[$comp. "-". $wk]))
       {
