@@ -449,7 +449,18 @@
 
       //print_r ([$work_title, worksimplifier ($work_title)]);
 
-      $tracks[$alb["attributes"]["composerName"]. " | ". worksimplifier ($work_title) /*. " | ". $alb["attributes"]["artistName"]*/][] = Array (
+      $trackey = $alb["attributes"]["composerName"]. " | ". worksimplifier ($work_title);
+
+      if (end ($trackindex) == $trackey)
+      {
+        $trackarrkey = array_key_last ($trackindex). "-". $trackey;
+      }
+      else
+      {
+        $trackarrkey = $alb["attributes"]["trackNumber"]. "-". $trackey;
+      }
+
+      $tracks[$trackarrkey][] = Array (
         "composer" => $alb["attributes"]["composerName"],
         "work" => trim ($work_title),
         "full_title" => $alb["attributes"]["name"],
@@ -461,6 +472,8 @@
         "preview" => $alb["attributes"]["previews"][0]["url"],
         "performers" => $performers
       );
+
+      $trackindex[$alb["attributes"]["trackNumber"]] = $trackey;
 
       $works[] = ["composer" => $alb["attributes"]["composerName"], "title" => trim ($work_title)];
     }
@@ -555,6 +568,8 @@
         $allperformers = array_merge ($allperformers, $track["performers"]);
       }
     }
+
+    //print_r ($return);
 
     // detecting multiple recordings of a same work
 
