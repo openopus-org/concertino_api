@@ -453,7 +453,7 @@
 
       if (end ($trackindex) == $trackey)
       {
-        $trackarrkey = array_key_last ($trackindex). "-". $trackey;
+        $trackarrkey = key (end ($trackindex)). "-". $trackey;
       }
       else
       {
