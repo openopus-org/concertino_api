@@ -94,7 +94,7 @@
 
           $work_title = trim ($work_title);
 
-          $compworks[str_replace ("-", "", slug ($alb["attributes"]["composerName"])). str_replace ("-", "", slug (/*worksimplifier (*/$work_title/*)*/))] = ["composer" => $alb["attributes"]["composerName"], "title" => $work_title];
+          $compworks[str_replace ("-", "", slug ($alb["attributes"]["composerName"])). str_replace ("-", "", workslug ($work_title))] = ["composer" => $alb["attributes"]["composerName"], "title" => $work_title];
 
           $singletrack = (isset ($return[$apple_albumid]["tracks"][str_replace ("-", "", slug ($alb["attributes"]["composerName"]))][str_replace ("-", "", slug (worksimplifier ($work_title)))]) ? "false" : "true");
 
@@ -114,7 +114,7 @@
 
           // returning array
 
-          $return[$apple_albumid]["tracks"][str_replace ("-", "", slug ($alb["attributes"]["composerName"]))][str_replace ("-", "", slug (/*worksimplifier (*/$work_title/*)*/))][] = Array 
+          $return[$apple_albumid]["tracks"][str_replace ("-", "", slug ($alb["attributes"]["composerName"]))][str_replace ("-", "", workslug ($work_title))][] = Array 
             (
               "id" => $alb["attributes"]["playParams"]["id"],
               "full_title" => $alb["attributes"]["name"],
@@ -447,7 +447,7 @@
         }
       }
 
-      $trackey = $alb["attributes"]["composerName"]. " | ". slug ($work_title);
+      $trackey = $alb["attributes"]["composerName"]. " | ". workslug ($work_title);
 
       if (end ($trackindex)["value"] == $trackey)
       {
@@ -482,11 +482,9 @@
 
     $guessedworks = openopusdownparse ("dyn/work/guess/", ["works"=>json_encode ($works)]);
 
-    //print_r ($guessedworks);
-
     foreach ($guessedworks["works"] as $gwork)
     {
-      $worksdb[str_replace ("-", "", slug ($gwork["requested"]["composer"])). "-". str_replace ("-", "", slug (/*worksimplifier (*/$gwork["requested"]["title"]/*)*/))] = $gwork["guessed"];  
+      $worksdb[str_replace ("-", "", slug ($gwork["requested"]["composer"])). "-". str_replace ("-", "", workslug ($gwork["requested"]["title"]))] = $gwork["guessed"];  
     }
 
     foreach ($guessedworks["composers"] as $gcmp)
@@ -495,7 +493,8 @@
     }
 
     //print_r ($worksdb);
-
+    //print_r ($tracks);
+    
     // compiling album array
 
     $allperformers = Array ();
@@ -503,7 +502,7 @@
     foreach ($tracks as $ktr => $tr)
     {
       $comp = str_replace ("-", "", slug ($tr[0]["composer"]));
-      $wk = str_replace ("-", "", slug (/*worksimplifier (*/$tr[0]["work"]/*)*/));
+      $wk = str_replace ("-", "", workslug ($tr[0]["work"]));
 
       if (isset ($worksdb[$comp. "-". $wk]))
       {
@@ -585,15 +584,16 @@
       {
         $fullperformers = allperformers ($track["performers"], $perfsdb["performers"]["digest"], $work["work"]["composer"]["complete_name"]);
         $performers = array_slice ($fullperformers, -2, 2, true);
-        $newkey = "wkid-". $work["work"]["id"]. "-". $apple_albumid . "-". slug(implode ("-", arraykeepvalues ($performers, ["name"])));
         
+        $newkey = $workkeys. "-". slug(implode ("-", arraykeepvalues ($performers, ["name"])));
+
         if (array_key_exists ($newkey, $newreturn))
         {
           $newreturn[$newkey]["tracks"][] = $track;
         }
         else
         {
-          $newreturn[$newkey] = ["work" => $work["work"], "performers" => $fullperformers, "tracks" => [$track], "recording_id" => $newkey];          
+          $newreturn[$newkey] = ["work" => $work["work"], "performers" => $fullperformers, "tracks" => [$track], "recording_id" => "wkid-". $work["work"]["id"]. "-". $apple_albumid . "-". slug(implode ("-", arraykeepvalues ($performers, ["name"]))). "-". explode ("-", $workkeys)[0]];          
         }
       }
     }
