@@ -448,16 +448,17 @@
       }
 
       $trackey = $alb["attributes"]["composerName"]. " | ". workslug ($work_title);
+      $tracknumber = ($alb["attributes"]["discNumber"] * 1000) + $alb["attributes"]["trackNumber"];
 
       if (end ($trackindex)["value"] == $trackey)
       {
         $trackarrkey = end ($trackindex)["key"]. "-". $trackey;
-        $trackindex[$alb["attributes"]["trackNumber"]] = ["key" => end ($trackindex)["key"], "value" => $trackey];
+        $trackindex[$tracknumber] = ["key" => end ($trackindex)["key"], "value" => $trackey];
       }
       else
       {
-        $trackarrkey = $alb["attributes"]["trackNumber"]. "-". $trackey;
-        $trackindex[$alb["attributes"]["trackNumber"]] = ["key" => $alb["attributes"]["trackNumber"], "value" => $trackey];
+        $trackarrkey = $tracknumber. "-". $trackey;
+        $trackindex[$tracknumber] = ["key" => $tracknumber, "value" => $trackey];
       }
 
       $tracks[$trackarrkey][] = Array (
@@ -476,7 +477,8 @@
       $works[] = ["composer" => $alb["attributes"]["composerName"], "title" => trim ($work_title)];
     }
 
-    //print_r ($works);
+    //print_r ($trackindex);
+    //print_r ($tracks);
 
     // guessing composer and works
 
