@@ -426,6 +426,8 @@
       }
       else
       {
+        $alb["attributes"]["name"] = str_replace ($alb["attributes"]["composerName"]. ":", "", $alb["attributes"]["name"]);
+        $alb["attributes"]["name"] = str_replace (end (explode (" ", $alb["attributes"]["composerName"])). ":", "", $alb["attributes"]["name"]);
         $work_title = explode(":", $alb["attributes"]["name"])[0];
       }
 
