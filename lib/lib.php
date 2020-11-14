@@ -134,12 +134,12 @@
 
     foreach ($guessedworks["works"] as $gwork)
     {
-      $worksdb[str_replace ("-", "", slug ($gwork["requested"]["composer"])). "-". str_replace ("-", "", slug (worksimplifier ($gwork["requested"]["title"])))] = $gwork["guessed"];
+      $worksdb[str_replace ("-", "", slug ($gwork["requested"]["composer"])). "-". str_replace ("-", "", workslug ($gwork["requested"]["title"]))] = $gwork["guessed"];
     }
 
     foreach ($guessedworks["composers"] as $gcmp)
     {
-      $compsdb[str_replace ("-", "", workslug ($gcmp["requested"]))] = $gcmp["guessed"];
+      $compsdb[str_replace ("-", "", slug ($gcmp["requested"]))] = $gcmp["guessed"];
     }
 
     $allperformers = Array ();
