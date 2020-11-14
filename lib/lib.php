@@ -449,7 +449,7 @@
         }
       }
 
-      $trackey = preg_split("/(\,|\&)/", $alb["attributes"]["composerName"])[0]. " | ". workslug ($work_title);
+      $trackey = trim (preg_split("/(\,|\&)/", $alb["attributes"]["composerName"])[0]). " | ". workslug ($work_title);
       $tracknumber = ($alb["attributes"]["discNumber"] * 1000) + $alb["attributes"]["trackNumber"];
 
       if (end ($trackindex)["value"] == $trackey)
