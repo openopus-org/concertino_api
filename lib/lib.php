@@ -449,7 +449,7 @@
         }
       }
 
-      $trackey = $alb["attributes"]["composerName"]. " | ". workslug ($work_title);
+      $trackey = preg_split("/(\,|\&)/", $alb["attributes"]["composerName"])[0]. " | ". workslug ($work_title);
       $tracknumber = ($alb["attributes"]["discNumber"] * 1000) + $alb["attributes"]["trackNumber"];
 
       if (end ($trackindex)["value"] == $trackey)
@@ -479,8 +479,8 @@
       $works[] = ["composer" => $alb["attributes"]["composerName"], "title" => trim ($work_title)];
     }
 
-    print_r ($trackindex);
-    print_r ($tracks);
+    //print_r ($trackindex);
+    //print_r ($tracks);
 
     // guessing composer and works
 
