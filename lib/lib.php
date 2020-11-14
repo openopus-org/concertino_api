@@ -139,7 +139,7 @@
 
     foreach ($guessedworks["composers"] as $gcmp)
     {
-      $compsdb[str_replace ("-", "", slug ($gcmp["requested"]))] = $gcmp["guessed"];
+      $compsdb[str_replace ("-", "", workslug ($gcmp["requested"]))] = $gcmp["guessed"];
     }
 
     $allperformers = Array ();
