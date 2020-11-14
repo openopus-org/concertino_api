@@ -96,7 +96,7 @@
 
           $compworks[str_replace ("-", "", slug ($alb["attributes"]["composerName"])). str_replace ("-", "", workslug ($work_title))] = ["composer" => $alb["attributes"]["composerName"], "title" => $work_title];
 
-          $singletrack = (isset ($return[$apple_albumid]["tracks"][str_replace ("-", "", slug ($alb["attributes"]["composerName"]))][str_replace ("-", "", slug (worksimplifier ($work_title)))]) ? "false" : "true");
+          $singletrack = (isset ($return[$apple_albumid]["tracks"][str_replace ("-", "", slug ($alb["attributes"]["composerName"]))][str_replace ("-", "", workslug ($work_title))]) ? "false" : "true");
 
           // treating composers names
 
