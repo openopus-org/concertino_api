@@ -479,8 +479,8 @@
       $works[] = ["composer" => $alb["attributes"]["composerName"], "title" => trim ($work_title)];
     }
 
-    //print_r ($trackindex);
-    //print_r ($tracks);
+    print_r ($trackindex);
+    print_r ($tracks);
 
     // guessing composer and works
 
