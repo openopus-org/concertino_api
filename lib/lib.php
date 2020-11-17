@@ -464,7 +464,7 @@
       }
 
       $tracks[$trackarrkey][] = Array (
-        "composer" => $alb["attributes"]["composerName"],
+        "composer" => ($alb["attributes"]["composerName"] ? $alb["attributes"]["composerName"] : "None"),
         "work" => trim ($work_title),
         "full_title" => $alb["attributes"]["name"],
         "title" => trim (str_replace ("(Live)", "", end (explode (":", end (explode ("/", preg_replace ('/((\[|\().*(\]|\)))/U', '', $alb["attributes"]["name"]))))))),
