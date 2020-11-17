@@ -208,7 +208,16 @@
       foreach ($album["tracks"] as $track)
       {
         $fullperformers = allperformers ($track["performers"], $perfsdb["performers"]["digest"], $album["work"]["composer"]["complete_name"]);
-        $performers = array_slice ($fullperformers, -2, 2, true);
+
+        if (sizeof ($track["performers"]) <= 5)
+        {
+          $performers = array_slice ($fullperformers, -2, 2, true);
+        }
+        else
+        {
+          $performers = [["name" => "Several", "role" => "Several"]];
+        }
+
         $newkey = "wkid-". $album["work"]["id"]. "-". $album["apple_albumid"] . "-". slug(implode ("-", arraykeepvalues ($performers, ["name"])));
         
         $newreturn[$newkey] = $album;
@@ -587,7 +596,15 @@
       foreach ($work["tracks"] as $track)
       {
         $fullperformers = allperformers ($track["performers"], $perfsdb["performers"]["digest"], $work["work"]["composer"]["complete_name"]);
-        $performers = array_slice ($fullperformers, -2, 2, true);
+        
+        if (sizeof ($track["performers"]) <= 5)
+        {
+          $performers = array_slice ($fullperformers, -2, 2, true);
+        }
+        else
+        {
+          $performers = [["name" => "Several", "role" => "Several"]];
+        }
         
         $newkey = $workkeys. "-". slug(implode ("-", arraykeepvalues ($performers, ["name"])));
 
