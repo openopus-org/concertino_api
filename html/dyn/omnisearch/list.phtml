@@ -64,7 +64,7 @@
             "observation" => $rec["observation"],
             "compilation" => ($rec["compilation"] ? "true" : (any_string (COMPILATION_PERFORMERS, $rec["performers"]) ? "true" : "false")),
             "verified" => $rec["verified"],
-            "relevance" => $rec["relevance"]
+            "relevance" => $rec["relevance"],
           );
 
         foreach (explode ("||", $rec["performers"]) as $perf)
@@ -113,6 +113,7 @@
       foreach ($apirecordings as $apid => $apirec)
       {
         $apirecordings[$apid]["performers"] = orderperformers ($apirec["performers"]);
+        $apirecordings[$apid]["recording_id"] = "wkid-". $apirec["work"]["id"]. "-". $apirec["apple_albumid"] . "-". slug(implode ("-", arraykeepvalues ($apirecordings[$apid]["performers"], ["name"])));
       }
 
       $apireturn["recordings"] = array_values ($apirecordings);
@@ -206,8 +207,11 @@
 
       $apireturn["status"]["rows"] = sizeof ($recordings);
 
-      $apireturn["composers"] = array_values ($apireturn["composers"]);
-      $apireturn["works"] = array_slice (array_values ($apireturn["works"]), 0, 5);
+      if (!$_REQUEST["offset"])
+      {
+        $apireturn["composers"] = array_values ($apireturn["composers"]);
+        $apireturn["works"] = array_slice (array_values ($apireturn["works"]), 0, 5);
+      }
 
       if (sizeof ($recordings) == 25)
       {
