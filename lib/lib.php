@@ -76,11 +76,19 @@
 
           if (isset ($alb["attributes"]["workName"]))
           {
-            $work_title = $alb["attributes"]["workName"];
+            $alb["attributes"]["workName"] = str_replace ($alb["attributes"]["composerName"]. ":", "", $alb["attributes"]["workName"]);
+            $alb["attributes"]["workName"] = str_replace (end (explode (" ", $alb["attributes"]["composerName"])). ":", "", $alb["attributes"]["workName"]);
+            $work_title = explode(":", $alb["attributes"]["workName"])[0];
+
+            //$work_title = $alb["attributes"]["workName"];
           }
           else
           {
-            $work_title = explode(":", $alb["attributes"]["name"])[0];
+            $alb["attributes"]["name"] = str_replace ($alb["attributes"]["composerName"]. ":", "", $alb["attributes"]["name"]);
+            $alb["attributes"]["name"] = str_replace (end (explode (" ", $alb["attributes"]["composerName"])). ":", "", $alb["attributes"]["name"]);
+            $work_title = explode(":", $alb["attributes"]["workName"])[0];
+
+            //$work_title = explode(":", $alb["attributes"]["name"])[0];
           }
 
           preg_match ('/(\(.*?\))/i', $alb["attributes"]["name"], $matches);
@@ -431,7 +439,11 @@
     {
       if (isset ($alb["attributes"]["workName"]))
       {
-        $work_title = $alb["attributes"]["workName"];
+        $alb["attributes"]["workName"] = str_replace ($alb["attributes"]["composerName"]. ":", "", $alb["attributes"]["workName"]);
+        $alb["attributes"]["workName"] = str_replace (end (explode (" ", $alb["attributes"]["composerName"])). ":", "", $alb["attributes"]["workName"]);
+        $work_title = explode(":", $alb["attributes"]["workName"])[0];
+
+        //$work_title = $alb["attributes"]["workName"];
       }
       else
       {
