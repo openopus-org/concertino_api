@@ -217,7 +217,7 @@
       {
         $fullperformers = allperformers ($track["performers"], $perfsdb["performers"]["digest"], $album["work"]["composer"]["complete_name"]);
 
-        if (sizeof ($track["performers"]) <= 5)
+        if (sizeof ($track["performers"]) <= 5 || arrayitems (["Orchestra", "Conductor"], "role", $fullperformers))
         {
           $performers = array_slice ($fullperformers, -2, 2, true);
         }
@@ -609,7 +609,7 @@
       {
         $fullperformers = allperformers ($track["performers"], $perfsdb["performers"]["digest"], $work["work"]["composer"]["complete_name"]);
         
-        if (sizeof ($track["performers"]) <= 5)
+        if (sizeof ($track["performers"]) <= 5 || arrayitems (["Orchestra", "Conductor"], "role", $fullperformers))
         {
           $performers = array_slice ($fullperformers, -2, 2, true);
         }
