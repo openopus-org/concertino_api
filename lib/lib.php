@@ -441,15 +441,23 @@
       {
         $alb["attributes"]["workName"] = str_replace ($alb["attributes"]["composerName"]. ":", "", $alb["attributes"]["workName"]);
         $alb["attributes"]["workName"] = str_replace (end (explode (" ", $alb["attributes"]["composerName"])). ":", "", $alb["attributes"]["workName"]);
-        $work_title = explode(":", $alb["attributes"]["workName"])[0];
 
-        //$work_title = $alb["attributes"]["workName"];
+        preg_match_all (CATALOGUE_REGEX, $alb["attributes"]["workName"], $matches);
+        $catalogue = trim(end($matches[2]));
+
+        $work_title = explode(":", str_replace ($catalogue, str_replace (":", " ", $catalogue), $alb["attributes"]["workName"]))[0];
+        $work_title = str_replace (str_replace (":", " ", $catalogue), $catalogue, $work_title);
       }
       else
       {
         $alb["attributes"]["name"] = str_replace ($alb["attributes"]["composerName"]. ":", "", $alb["attributes"]["name"]);
         $alb["attributes"]["name"] = str_replace (end (explode (" ", $alb["attributes"]["composerName"])). ":", "", $alb["attributes"]["name"]);
-        $work_title = explode(":", $alb["attributes"]["name"])[0];
+        
+        preg_match_all (CATALOGUE_REGEX, $alb["attributes"]["name"], $matches);
+        $catalogue = trim(end($matches[2]));
+
+        $work_title = explode(":", str_replace ($catalogue, str_replace (":", " ", $catalogue), $alb["attributes"]["name"]))[0];
+        $work_title = str_replace (str_replace (":", " ", $catalogue), $catalogue, $work_title);
       }
 
       preg_match ('/(\(.*?\))/i', $alb["attributes"]["name"], $matches);
@@ -482,6 +490,11 @@
       {
         $trackarrkey = $tracknumber. "-". $trackey;
         $trackindex[$tracknumber] = ["key" => $tracknumber, "value" => $trackey];
+      }
+
+      if (stristr ($catalogue, ":"))
+      {
+        $alb["attributes"]["name"] = str_replace ($catalogue, str_replace (":", " ", $catalogue), $alb["attributes"]["name"]);
       }
 
       $tracks[$trackarrkey][] = Array (
@@ -824,6 +837,11 @@
             
             $apple_albumid = explode ("?", end (explode ("/", $alb["attributes"]["url"])))[0];
             
+            if (stristr ($work["work"]["catalogue"], ":"))
+            {
+              $alb["attributes"]["name"] = str_replace ($work["work"]["catalogue"], str_replace (":", " ", $work["work"]["catalogue"]), $alb["attributes"]["name"]);
+            }
+
             $albums[$apple_albumid][] = Array 
             (
               "similarity_between" => Array ($work["work"]["searchtitle"], worksimplifier (explode (":", $alb["attributes"]["name"])[0])),
