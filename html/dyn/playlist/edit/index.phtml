@@ -31,10 +31,12 @@
           foreach ($recs as $rec)
           {
             $recp = explode ("-", $rec);
-            $recq[] = "('{$recp[0]}','{$recp[1]}','{$recp[2]}')";
+            $recq[] = "('{$recp[1]}','{$recp[2]}')";
+            //$recq[] = "('{$recp[0]}','{$recp[1]}','{$recp[2]}')";
           }
           
-          $query = "delete from playlist_recording where playlist_id = '{$_REQUEST["pid"]}' and (work_id, apple_albumid, subset) in (". implode (",", $recq). ")";
+          $query = "delete from playlist_recording where playlist_id = '{$_REQUEST["pid"]}' and (work_id, apple_albumid) in (". implode (",", $recq). ")";
+          //$query = "delete from playlist_recording where playlist_id = '{$_REQUEST["pid"]}' and (work_id, apple_albumid, subset) in (". implode (",", $recq). ")";
           mysqli_query ($mysql, $query);
         }
         
