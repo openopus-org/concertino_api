@@ -35,7 +35,7 @@ innodb_ft_min_token_size = 1
 innodb_ft_enable_stopword = 0
 ```
 
-#### Search data
+### Search data
 
 The search database will be renewed automatically every night (see "cache cleaning routines", below). To make the first import, simply run on command line:
 
