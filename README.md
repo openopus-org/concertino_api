@@ -26,6 +26,23 @@ vim inc.php
 ```
 5. Change variable values in the `lib/inc.php` accordingly to your webserver and Apple Music developer token. Learn on how to create one [here](https://developer.apple.com/documentation/applemusicapi/getting_keys_and_creating_tokens). Good luck!
 
+### MySQL settings
+
+Concertino search functionality needs special configurations on your MySQL database. Update your server's `my.cnf` file (paths may vary on different operating systems) to include two extra directives:
+
+```
+innodb_ft_min_token_size = 1
+innodb_ft_enable_stopword = 0
+```
+
+#### Search data
+
+The search database will be renewed automatically every night (see "cache cleaning routines", below). To make the first import, simply run on command line:
+
+```bash
+php /var/www/concertino_api/cln/omnisearch.php
+```
+
 ### Cache and cache cleaning routines
 
 The Concertino API can cache its results, saving server resources. In order to activate this feature you must:
