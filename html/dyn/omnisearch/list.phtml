@@ -147,6 +147,15 @@
         unset ($apireturn["valid-recordings"]);
       }
 
+      // removing duplicate entries
+
+      foreach ($apireturn["recordings"] as $recs)
+      {
+        $validrecordings[$recs["recording_id"]] = $recs;
+      }
+
+      $apireturn["recordings"] = array_values ($validrecordings);
+
       // composers and works search
 
       if (!$_REQUEST["offset"])
