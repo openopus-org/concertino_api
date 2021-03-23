@@ -1003,7 +1003,7 @@
 
     // inserting performers into the recording abstract database
 
-    if (mysqli_affected_rows ($mysql) > 0 || true)
+    if (mysqli_affected_rows ($mysql) > 0)
     {
       $performers = json_decode ($request["performers"], true);
 
