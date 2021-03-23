@@ -998,12 +998,12 @@
   {
     global $mysql;
 
-    $query = "insert into recording (work_id, composer_name, work_title, apple_albumid, subset, apple_imgurl) values ('{$request["wid"]}', '{$request["composer"]}', '{$request["work"]}', '{$request["aid"]}', '{$request["set"]}', '{$request["cover"]}')";
+    echo $query = "insert into recording (work_id, composer_name, work_title, apple_albumid, subset, apple_imgurl) values ('{$request["wid"]}', '{$request["composer"]}', '{$request["work"]}', '{$request["aid"]}', '{$request["set"]}', '{$request["cover"]}')";
     mysqli_query ($mysql, $query);
 
     // inserting performers into the recording abstract database
 
-    if (mysqli_affected_rows ($mysql) > 0)
+    if (mysqli_affected_rows ($mysql) > 0 || true)
     {
       $performers = json_decode ($request["performers"], true);
 
