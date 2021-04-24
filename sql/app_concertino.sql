@@ -1,11 +1,11 @@
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 
-
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8mb4 */;
+
 
 CREATE TABLE `omnisearch` (
   `summary` varchar(6000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -14,7 +14,7 @@ CREATE TABLE `omnisearch` (
   `composer_id` int(10) UNSIGNED NOT NULL,
   `work_id` varchar(256) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
   `apple_albumid` varchar(256) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
-  `subset` int(11) UNSIGNED NOT NULL DEFAULT '1',
+  `subset` int(30) UNSIGNED NOT NULL DEFAULT '1',
   `recommended` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
   `popular` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
   `plays` int(10) UNSIGNED NOT NULL DEFAULT '0',
@@ -34,7 +34,7 @@ CREATE TABLE `playlist_recording` (
   `position` int(10) UNSIGNED DEFAULT NULL,
   `work_id` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
   `apple_albumid` varchar(256) CHARACTER SET latin1 NOT NULL,
-  `subset` int(11) DEFAULT NULL
+  `subset` int(30) UNSIGNED DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `recording` (
@@ -48,7 +48,7 @@ CREATE TABLE `recording` (
   `upc` varchar(256) DEFAULT NULL,
   `apple_albumid` varchar(256) NOT NULL,
   `apple_imgurl` varchar(1024) DEFAULT NULL,
-  `subset` int(11) UNSIGNED NOT NULL DEFAULT '1',
+  `subset` int(30) UNSIGNED NOT NULL DEFAULT '1',
   `verified` tinyint(1) DEFAULT '0',
   `wrongdata` tinyint(1) DEFAULT '0',
   `spam` tinyint(1) DEFAULT '0',
@@ -59,7 +59,7 @@ CREATE TABLE `recording` (
 CREATE TABLE `recording_performer` (
   `apple_albumid` varchar(256) NOT NULL,
   `work_id` varchar(256) NOT NULL,
-  `subset` int(11) UNSIGNED NOT NULL DEFAULT '1',
+  `subset` int(30) UNSIGNED NOT NULL DEFAULT '1',
   `performer` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `role` varchar(256) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -68,13 +68,13 @@ CREATE TABLE `shortrec` (
   `id` int(11) UNSIGNED NOT NULL,
   `work_id` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
   `apple_albumid` varchar(256) CHARACTER SET latin1 NOT NULL,
-  `subset` int(11) NOT NULL DEFAULT '1'
+  `subset` int(30) UNSIGNED NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `track` (
   `work_id` int(11) UNSIGNED NOT NULL,
   `apple_albumid` varchar(256) NOT NULL,
-  `subset` int(11) UNSIGNED NOT NULL,
+  `subset` int(30) UNSIGNED NOT NULL,
   `cd` int(10) UNSIGNED NOT NULL,
   `position` int(10) UNSIGNED NOT NULL,
   `length` int(10) UNSIGNED NOT NULL,
@@ -107,7 +107,7 @@ CREATE TABLE `user_recording` (
   `user_id` int(12) UNSIGNED NOT NULL,
   `work_id` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
   `apple_albumid` varchar(256) CHARACTER SET latin1 NOT NULL,
-  `subset` int(11) NOT NULL DEFAULT '1',
+  `subset` int(30) UNSIGNED NOT NULL DEFAULT '1',
   `favorite` tinyint(1) DEFAULT NULL,
   `plays` int(10) UNSIGNED DEFAULT '0',
   `lastplay` int(11) DEFAULT NULL
@@ -119,6 +119,7 @@ CREATE TABLE `user_work` (
   `composer_id` int(10) UNSIGNED DEFAULT NULL,
   `favorite` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
 
 ALTER TABLE `omnisearch`
   ADD KEY `recommended` (`recommended`),
@@ -201,13 +202,11 @@ ALTER TABLE `user_work`
 
 
 ALTER TABLE `playlist`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=225;
-
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 ALTER TABLE `shortrec`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=883;
-
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
 ALTER TABLE `user`
-  MODIFY `id` int(12) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17177;
+  MODIFY `id` int(12) UNSIGNED NOT NULL AUTO_INCREMENT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
