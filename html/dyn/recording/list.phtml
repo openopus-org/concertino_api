@@ -60,8 +60,8 @@
           "observation" => $alb["observation"],
           "performers" => $fullperformers,
           //"performers" => ($alb["extraperformers"]) ? orderperformers ($alb["extraperformers"]) : allperformers ($alb["performers"], $rldb, $apireturn["work"]["composer"]["complete_name"]),
-          //"set" => ($alb["subset"]) ? intval ($alb["subset"]) : 1,
-          "set" => (Int) $alb["apple_trackid"],
+          "set" => ($alb["subset"]) ? intval ($alb["subset"]) : 1,
+          //"set" => (Int) $alb["apple_trackid"],
           "historic" => $alb["historic"] ? "true" : "false",
           "verified" => $alb["verified"] ? "true" : "false",
           "recommended" => $alb["recommended"] ? "true" : "false"
